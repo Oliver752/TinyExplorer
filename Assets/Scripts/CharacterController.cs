@@ -18,7 +18,7 @@ public class CompleteFPCC : MonoBehaviour
     public float crouchSpeed = 2.5f;
     
     [Header("Jump Settings")]
-    public float jumpHeight = 1.5f;
+    public float jumpHeight = 0.15f;
     public float gravityValue = 9.81f;
     
     [Header("Crouch Settings")]
@@ -57,21 +57,29 @@ public class CompleteFPCC : MonoBehaviour
     private float walkBobTimer;
 
     void Start()
-    {
-        controller = GetComponent<CharacterController>();
-        playerTx = transform;
-        
-        // Lock cursor for FPS
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-         if (!leftArm || !rightArm)
-    {
+{
+    controller = GetComponent<CharacterController>();
+    playerTx = transform;
+
+    // 🔽 ZMENŠENIE POSTAVY
+    float scaleFactor = 0.1f;
+    playerTx.localScale = Vector3.one * scaleFactor;
+    controller.height *= scaleFactor;
+    controller.radius *= scaleFactor;
+    controller.center *= scaleFactor;
+
+    // Kamera trochu nižšie
+    if (cameraTx) cameraTx.localPosition *= scaleFactor;
+
+    Cursor.lockState = CursorLockMode.Locked;
+    Cursor.visible = false;
+
+    if (!leftArm || !rightArm)
         CreateTestArms();
-    }
-        // Initialize arm positions if they exist
-        if (leftArm) leftArm.localPosition = new Vector3(-0.3f, -0.4f, 0.5f);
-        if (rightArm) rightArm.localPosition = new Vector3(0.3f, -0.4f, 0.5f);
-    }
+
+    if (leftArm) leftArm.localPosition = new Vector3(-0.05f, -0.05f, 0.1f);
+if (rightArm) rightArm.localPosition = new Vector3(0.05f, -0.05f, 0.1f);
+}
 
     void Update()
     {
