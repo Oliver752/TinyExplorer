@@ -18,8 +18,8 @@ public class CompleteFPCC : MonoBehaviour
     public float crouchSpeed = 2.5f;
     
     [Header("Jump Settings")]
-    public float jumpHeight = 0.15f;
-    public float gravityValue = 9.81f;
+    public float jumpHeight = 0.2f;
+    public float gravityValue = 5f;
     
     [Header("Crouch Settings")]
     public float standingHeight = 2f;
@@ -58,18 +58,32 @@ public class CompleteFPCC : MonoBehaviour
 
     void Start()
 {
-    controller = GetComponent<CharacterController>();
-    playerTx = transform;
+        controller = GetComponent<CharacterController>();
+    playerTx   = transform;
 
-    // 🔽 ZMENŠENIE POSTAVY
-    float scaleFactor = 0.1f;
-    playerTx.localScale = Vector3.one * scaleFactor;
-    controller.height *= scaleFactor;
-    controller.radius *= scaleFactor;
-    controller.center *= scaleFactor;
+        // 🔽 SCALE ONLY IF ACTIVE
+        if (gameObject.activeInHierarchy && controller.enabled)
+        {
+            float scaleFactor = 0.1f;
 
-    // Kamera trochu nižšie
-    if (cameraTx) cameraTx.localPosition *= scaleFactor;
+            // 1. disable BEFORE changing any geometry
+            controller.enabled = false;
+
+            // 2. apply scale to all size-related properties
+            controller.height *= scaleFactor;
+            controller.radius *= scaleFactor;
+            controller.center *= scaleFactor;
+
+            // 3. set a stepOffset that is valid for the NEW size
+            controller.stepOffset = Mathf.Min(controller.height * 0.25f, controller.radius * 2f);
+
+            // 4. NOW enable → Unity’s check passes
+            controller.enabled = true;
+
+            if (playerGFX) playerGFX.localScale = Vector3.one * scaleFactor;
+        }
+
+    if (cameraTx) cameraTx.localPosition = new Vector3(0f, 0.1f, 0f);
 
     Cursor.lockState = CursorLockMode.Locked;
     Cursor.visible = false;
@@ -78,7 +92,7 @@ public class CompleteFPCC : MonoBehaviour
         CreateTestArms();
 
     if (leftArm) leftArm.localPosition = new Vector3(-0.05f, -0.05f, 0.1f);
-if (rightArm) rightArm.localPosition = new Vector3(0.05f, -0.05f, 0.1f);
+    if (rightArm) rightArm.localPosition = new Vector3(0.05f, -0.05f, 0.1f);
 }
 
     void Update()
@@ -192,19 +206,23 @@ if (rightArm) rightArm.localPosition = new Vector3(0.05f, -0.05f, 0.1f);
     }
 
     void ApplyGravity()
+{
+    if (!controller || !controller.enabled) return;
+
+    if (!isGrounded)
     {
-        if (!isGrounded)
-        {
-            verticalVelocity -= gravityValue * Time.deltaTime;
-        }
-        else if (verticalVelocity < 0)
-        {
-            verticalVelocity = 0f;
-        }
-        
-        moveDirection.y = verticalVelocity;
-        controller.Move(moveDirection * Time.deltaTime);
+        verticalVelocity -= gravityValue * Time.deltaTime;
     }
+    else if (verticalVelocity < 0)
+    {
+        verticalVelocity = 0f;
+    }
+
+    moveDirection.y = verticalVelocity;
+
+    if (controller.enabled)
+        controller.Move(moveDirection * Time.deltaTime);
+}
 
     // ===== NEW: ARM ANIMATION METHODS =====
     void HandleProceduralAnimation()

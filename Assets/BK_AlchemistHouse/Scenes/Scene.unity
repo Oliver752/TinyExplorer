@@ -19853,8 +19853,8 @@ MonoBehaviour:
   walkSpeed: 0.5
   runSpeed: 1
   crouchSpeed: 2.5
-  jumpHeight: 0.15
-  gravityValue: 9.81
+  jumpHeight: 0.2
+  gravityValue: 5
   standingHeight: 2
   crouchingHeight: 1
   crouchTransitionSpeed: 10
@@ -43025,7 +43025,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4059834266974270, guid: 10899ca432e87ce4eb8f93c0c7216a21, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.07
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 4059834266974270, guid: 10899ca432e87ce4eb8f93c0c7216a21, type: 3}
       propertyPath: m_LocalPosition.z
