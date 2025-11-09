@@ -15,7 +15,7 @@ public class DialogueEntry
 public class IntroSequenceController : MonoBehaviour
 {
     [Header("References")] public Camera introCamera; public SplinePath path; public GameObject player;
-    public Transform spawnPoint; public Camera gameplayCamera;
+    public Transform spawnPoint; public Camera gameplayCamera; public TutorialManager tutorialManager;
 
     [Header("UI")] public TextMeshProUGUI dialogueText; public CanvasGroup dialogueCanvasGroup;
 
@@ -114,6 +114,9 @@ public class IntroSequenceController : MonoBehaviour
         if (postProcessVolume) postProcessVolume.enabled = false;
         introFinished = true;
         Debug.Log("Intro Complete!");
+        if (tutorialManager != null){
+            tutorialManager.StartTutorial();
+        }
     }
 
     IEnumerator TransitionToGameplay()
@@ -129,6 +132,9 @@ public class IntroSequenceController : MonoBehaviour
 
         if (postProcessVolume) postProcessVolume.enabled = false;
         Debug.Log("Intro Complete!");
+        if (tutorialManager != null){
+            tutorialManager.StartTutorial();
+        }
     }
 
     IEnumerator FadeCanvasGroup(CanvasGroup cg, float startAlpha, float endAlpha, float duration)
