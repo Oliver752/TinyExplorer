@@ -3,14 +3,14 @@ using TMPro;
 
 public class TutorialManager : MonoBehaviour
 {
-    [Header("UI hivatkozások")]
-    public GameObject tutorialPanel;         // pl. TutorialPanel
-    public TextMeshProUGUI tutorialText;     // pl. TutorialText (TMP)
+    [Header("UI references")]
+    public GameObject tutorialPanel;         
+    public TextMeshProUGUI tutorialText;     
 
-    [Header("Időzítések")]
-    public float moveToJumpDelay = 3f;        // 3 mp mozgás után jön az ugrás
-    public float jumpToInteractDelay = 3f;    // 3 mp ugrás után jön az E
-    public float interactVisibleDuration = 3f; // 3 mp-ig látszik az E felirat
+    [Header("Časy")]
+    public float moveToJumpDelay = 3f;        
+    public float jumpToInteractDelay = 3f;    
+    public float interactVisibleDuration = 3f; 
 
     private enum Step
     {
@@ -45,7 +45,6 @@ public class TutorialManager : MonoBehaviour
                 HandleJumpStep();
                 break;
             case Step.Interact:
-                // időzítést coroutine intézi
                 break;
             case Step.Done:
                 break;
@@ -68,7 +67,6 @@ public class TutorialManager : MonoBehaviour
         ShowMoveText();
     }
 
-    // --- MOVE STEP ---
     void HandleMoveStep()
     {
         float h = Input.GetAxisRaw("Horizontal");
@@ -93,7 +91,6 @@ public class TutorialManager : MonoBehaviour
         runningCoroutine = null;
     }
 
-    // --- JUMP STEP ---
     void HandleJumpStep()
     {
         if (!jumpDetected && Input.GetKeyDown(KeyCode.Space))
@@ -103,7 +100,6 @@ public class TutorialManager : MonoBehaviour
             if (runningCoroutine != null)
                 StopCoroutine(runningCoroutine);
 
-            // ugyanúgy 3 mp-ig marad a jump felirat, mielőtt jön az E
             runningCoroutine = StartCoroutine(JumpToInteractTimer());
         }
     }
@@ -121,7 +117,6 @@ public class TutorialManager : MonoBehaviour
         runningCoroutine = StartCoroutine(HideAfterInteract());
     }
 
-    // --- INTERACT STEP ---
     System.Collections.IEnumerator HideAfterInteract()
     {
         yield return new WaitForSeconds(interactVisibleDuration);
@@ -134,7 +129,6 @@ public class TutorialManager : MonoBehaviour
         runningCoroutine = null;
     }
 
-    // --- UI feliratok ---
     void ShowMoveText()
     {
         if (tutorialPanel != null) tutorialPanel.SetActive(true);
