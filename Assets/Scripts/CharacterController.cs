@@ -57,9 +57,9 @@ public class CompleteFPCC : MonoBehaviour
     private float walkBobTimer;
 
     void Start()
-{
+    {
         controller = GetComponent<CharacterController>();
-    playerTx   = transform;
+        playerTx   = transform;
 
         // 🔽 SCALE ONLY IF ACTIVE
         if (gameObject.activeInHierarchy && controller.enabled)
@@ -83,20 +83,30 @@ public class CompleteFPCC : MonoBehaviour
             if (playerGFX) playerGFX.localScale = Vector3.one * scaleFactor;
         }
 
-    if (cameraTx) cameraTx.localPosition = new Vector3(0f, 0.1f, 0f);
+        if (cameraTx) cameraTx.localPosition = new Vector3(0f, 0.1f, 0f);
 
-    Cursor.lockState = CursorLockMode.Locked;
-    Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
 
-    if (!leftArm || !rightArm)
-        CreateTestArms();
+        if (!leftArm || !rightArm)
+            CreateTestArms();
 
-    if (leftArm) leftArm.localPosition = new Vector3(-0.05f, -0.05f, 0.1f);
-    if (rightArm) rightArm.localPosition = new Vector3(0.05f, -0.05f, 0.1f);
-}
+        if (leftArm) leftArm.localPosition = new Vector3(-0.05f, -0.05f, 0.1f);
+        if (rightArm) rightArm.localPosition = new Vector3(0.05f, -0.05f, 0.1f);
+    }
 
     void Update()
     {
+        // 🚫 Freeze all inputs/rotations/movement while paused
+        if (PauseMenuController.IsPaused)
+        {
+            // zero out any residuals so nothing accumulates during pause
+            inputMoveX = inputMoveY = inputLookX = inputLookY = 0f;
+            inputKeyRun = inputKeyCrouch = inputKeyJump = false;
+            moveDirection = Vector3.zero;
+            return;
+        }
+
         HandleInput();
         HandleLook();
         HandleMovement();
@@ -107,30 +117,32 @@ public class CompleteFPCC : MonoBehaviour
         // ===== NEW: CALL ARM ANIMATION =====
         HandleProceduralAnimation();
     }
+
     void CreateTestArms()
-{
-    // Create a visible red cube for left arm
-    GameObject left = GameObject.CreatePrimitive(PrimitiveType.Cube);
-    left.name = "TEST_LeftArm";
-    left.transform.SetParent(cameraTx);
-    left.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
-    left.transform.localPosition = new Vector3(-0.5f, -0.4f, 0.5f);
-    left.GetComponent<Renderer>().material.color = Color.red;
-    
-    // Create a visible blue cube for right arm
-    GameObject right = GameObject.CreatePrimitive(PrimitiveType.Cube);
-    right.name = "TEST_RightArm";
-    right.transform.SetParent(cameraTx);
-    right.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
-    right.transform.localPosition = new Vector3(0.5f, -0.4f, 0.5f);
-    right.GetComponent<Renderer>().material.color = Color.blue;
-    
-    // Assign them to the script
-    leftArm = left.transform;
-    rightArm = right.transform;
-    
-    Debug.Log("✅ TEST ARMS CREATED - Check if you see red/blue cubes!");
-}
+    {
+        // Create a visible red cube for left arm
+        GameObject left = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        left.name = "TEST_LeftArm";
+        left.transform.SetParent(cameraTx);
+        left.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+        left.transform.localPosition = new Vector3(-0.5f, -0.4f, 0.5f);
+        left.GetComponent<Renderer>().material.color = Color.red;
+        
+        // Create a visible blue cube for right arm
+        GameObject right = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        right.name = "TEST_RightArm";
+        right.transform.SetParent(cameraTx);
+        right.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+        right.transform.localPosition = new Vector3(0.5f, -0.4f, 0.5f);
+        right.GetComponent<Renderer>().material.color = Color.blue;
+        
+        // Assign them to the script
+        leftArm = left.transform;
+        rightArm = right.transform;
+        
+        Debug.Log("✅ TEST ARMS CREATED - Check if you see red/blue cubes!");
+    }
+
     void HandleInput()
     {
         inputMoveX = Input.GetAxis("Horizontal");
@@ -206,23 +218,23 @@ public class CompleteFPCC : MonoBehaviour
     }
 
     void ApplyGravity()
-{
-    if (!controller || !controller.enabled) return;
-
-    if (!isGrounded)
     {
-        verticalVelocity -= gravityValue * Time.deltaTime;
-    }
-    else if (verticalVelocity < 0)
-    {
-        verticalVelocity = 0f;
-    }
+        if (!controller || !controller.enabled) return;
 
-    moveDirection.y = verticalVelocity;
+        if (!isGrounded)
+        {
+            verticalVelocity -= gravityValue * Time.deltaTime;
+        }
+        else if (verticalVelocity < 0)
+        {
+            verticalVelocity = 0f;
+        }
 
-    if (controller.enabled)
-        controller.Move(moveDirection * Time.deltaTime);
-}
+        moveDirection.y = verticalVelocity;
+
+        if (controller.enabled)
+            controller.Move(moveDirection * Time.deltaTime);
+    }
 
     // ===== NEW: ARM ANIMATION METHODS =====
     void HandleProceduralAnimation()

@@ -29,21 +29,38 @@ public class IntroSequenceController : MonoBehaviour
     public List<DialogueEntry> dialogueEntries = new List<DialogueEntry>();
 
     private Coroutine introCoroutine;
-    private Coroutine currentDialogueFade; // <-- NEW: cache dialogue fades
+    private Coroutine currentDialogueFade; // cache dialogue fades
     private bool introFinished = false;
+
+    // optional: cache FreeCamera on gameplay camera to keep it disabled during intro
+    private FreeCamera cachedFreeCam;
 
     void Start()
     {
+        if (introCamera)
+        {
+            introCamera.gameObject.SetActive(true);
+            introCamera.targetDisplay = 0; // Display 1
+        }
+
+        if (gameplayCamera)
+        {
+            cachedFreeCam = gameplayCamera.GetComponent<FreeCamera>();
+            if (cachedFreeCam) cachedFreeCam.enabled = false; // no player cam movement during intro
+            gameplayCamera.gameObject.SetActive(false);
+            gameplayCamera.targetDisplay = 0; // Display 1
+        }
+
         if (player) player.SetActive(false);
-        if (gameplayCamera) gameplayCamera.gameObject.SetActive(false);
-        if (introCamera) introCamera.gameObject.SetActive(true);
         if (fullScreenFadeCanvasGroup) fullScreenFadeCanvasGroup.alpha = 1f;
 
         if (postProcessVolume) postProcessVolume.profile.TryGet(out depthOfField);
 
         if (introCamera && path)
-        { introCamera.transform.position = path.GetPoint(0f);
-          introCamera.transform.LookAt(path.GetPoint(lookAheadAmount)); }
+        {
+            introCamera.transform.position = path.GetPoint(0f);
+            introCamera.transform.LookAt(path.GetPoint(lookAheadAmount));
+        }
 
         introCoroutine = StartCoroutine(PlayIntro());
     }
@@ -52,13 +69,17 @@ public class IntroSequenceController : MonoBehaviour
     {
         // Phase 1: Initial Black Screen
         if (dialogueEntries.Count > 0)
-        {   dialogueText.text = dialogueEntries[0].text;
-            currentDialogueFade = StartCoroutine(FadeCanvasGroup(dialogueCanvasGroup, 0f, 1f, 1f)); }
+        {
+            dialogueText.text = dialogueEntries[0].text;
+            currentDialogueFade = StartCoroutine(FadeCanvasGroup(dialogueCanvasGroup, 0f, 1f, 1f));
+        }
         yield return new WaitForSeconds(initialHoldDuration);
 
         if (dialogueEntries.Count > 0)
-        {   if (currentDialogueFade != null) StopCoroutine(currentDialogueFade);
-            yield return FadeCanvasGroup(dialogueCanvasGroup, 1f, 0f, 0.5f); }
+        {
+            if (currentDialogueFade != null) StopCoroutine(currentDialogueFade);
+            yield return FadeCanvasGroup(dialogueCanvasGroup, 1f, 0f, 0.5f);
+        }
 
         // Phase 2: Fade From Black
         if (fullScreenFadeCanvasGroup)
@@ -75,7 +96,8 @@ public class IntroSequenceController : MonoBehaviour
 
             // Dialogue
             if (dialogueIndex < dialogueEntries.Count)
-            {   var entry = dialogueEntries[dialogueIndex];
+            {
+                var entry = dialogueEntries[dialogueIndex];
                 if (mainElapsed >= entry.displayTime && lastDialogueText != entry.text)
                 {
                     Debug.Log($"Showing dialogue: '{entry.text}' at time {mainElapsed}");
@@ -98,18 +120,34 @@ public class IntroSequenceController : MonoBehaviour
         yield return new WaitForSeconds(finalHoldDuration);
 
         // Phase 5: Transition to gameplay and fade back
-        if (introCamera) introCamera.gameObject.SetActive(false);
-        if (gameplayCamera) gameplayCamera.gameObject.SetActive(true);
-        if (fullScreenFadeCanvasGroup) yield return FadeCanvasGroup(fullScreenFadeCanvasGroup, 1f, 0f, initialFadeDuration);
 
+        // 1) Put the player at the spawn BEFORE activation so it doesn't update at old position
         if (player)
-        {   player.SetActive(true);
+        {
             player.transform.position = spawnPoint.position;
             player.transform.rotation = spawnPoint.rotation;
-            yield return null;
-            player.transform.position = spawnPoint.position;
-            player.transform.rotation = spawnPoint.rotation;
-         }
+        }
+
+        // 2) Activate the player
+        if (player) player.SetActive(true);
+
+        // 3) Ensure gameplay camera renders (turn on first), then enable any free-cam
+        if (gameplayCamera)
+        {
+            gameplayCamera.gameObject.SetActive(true);
+            gameplayCamera.enabled = true; // ensure Camera component is on
+        }
+        if (cachedFreeCam) cachedFreeCam.enabled = true;
+
+        // 4) Let gameplay camera render one frame before disabling intro camera
+        yield return null;
+
+        // 5) Now disable the intro camera (avoids "No cameras rendering")
+        if (introCamera) introCamera.gameObject.SetActive(false);
+
+        // 6) Fade back from black
+        if (fullScreenFadeCanvasGroup)
+            yield return FadeCanvasGroup(fullScreenFadeCanvasGroup, 1f, 0f, initialFadeDuration);
 
         if (postProcessVolume) postProcessVolume.enabled = false;
         introFinished = true;
@@ -121,14 +159,31 @@ public class IntroSequenceController : MonoBehaviour
 
     IEnumerator TransitionToGameplay()
     {
-        if (introCamera) introCamera.gameObject.SetActive(false);
-        if (gameplayCamera) gameplayCamera.gameObject.SetActive(true);
-        if (fullScreenFadeCanvasGroup) yield return FadeCanvasGroup(fullScreenFadeCanvasGroup, 1f, 0f, initialFadeDuration);
-
+        // Put player at spawn BEFORE activation
         if (player)
-        {   player.SetActive(true);
+        {
             player.transform.position = spawnPoint.position;
-            player.transform.rotation = spawnPoint.rotation; }
+            player.transform.rotation = spawnPoint.rotation;
+        }
+
+        // Activate player
+        if (player) player.SetActive(true);
+
+        // Make sure gameplay camera actually renders
+        if (gameplayCamera)
+        {
+            gameplayCamera.gameObject.SetActive(true);
+            gameplayCamera.enabled = true;
+        }
+        if (cachedFreeCam) cachedFreeCam.enabled = true;
+
+        // Allow one frame with gameplay camera on
+        yield return null;
+
+        // Disable intro camera and fade back
+        if (introCamera) introCamera.gameObject.SetActive(false);
+        if (fullScreenFadeCanvasGroup)
+            yield return FadeCanvasGroup(fullScreenFadeCanvasGroup, 1f, 0f, initialFadeDuration);
 
         if (postProcessVolume) postProcessVolume.enabled = false;
         Debug.Log("Intro Complete!");
@@ -154,7 +209,6 @@ public class IntroSequenceController : MonoBehaviour
         {
             if (introCoroutine != null)
             {
-                // INSTANTLY kill any on-screen dialogue when skipping  <-- NEW
                 if (currentDialogueFade != null) StopCoroutine(currentDialogueFade);
                 dialogueCanvasGroup.alpha = 0f;
 
