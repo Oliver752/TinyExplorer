@@ -22518,8 +22518,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86daec9f714ec234fa5f6a543150d393, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialManager
-  tutorialPanel: {fileID: 0}
-  tutorialText: {fileID: 0}
+  tutorialPanel: {fileID: 1793609566}
+  tutorialText: {fileID: 606400371}
   moveToJumpDelay: 3
   jumpToInteractDelay: 3
   interactVisibleDuration: 3
@@ -35104,7 +35104,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &606400371
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35190,7 +35190,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: -136.7088, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -62561,7 +62561,7 @@ MonoBehaviour:
   player: {fileID: 368872249}
   spawnPoint: {fileID: 626966990}
   gameplayCamera: {fileID: 941413681}
-  tutorialManager: {fileID: 0}
+  tutorialManager: {fileID: 428214307}
   dialogueText: {fileID: 271791283}
   dialogueCanvasGroup: {fileID: 271791282}
   fullScreenFadeCanvasGroup: {fileID: 1198089229}
@@ -62576,12 +62576,6 @@ MonoBehaviour:
   - text: Where Am I? :O
     displayTime: 0
     fadeDuration: 2
-  - text: FOOOOOOOOOS
-    displayTime: 3
-    fadeDuration: 1
-  - text: POME HRAT LOLKO
-    displayTime: 6.5
-    fadeDuration: 1
 --- !u!4 &1113974556
 Transform:
   m_ObjectHideFlags: 0
