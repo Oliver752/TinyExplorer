@@ -62576,12 +62576,6 @@ MonoBehaviour:
   - text: Where Am I? :O
     displayTime: 0
     fadeDuration: 2
-  - text: FOOOOOOOOOS
-    displayTime: 3
-    fadeDuration: 1
-  - text: POME HRAT LOLKO
-    displayTime: 6.5
-    fadeDuration: 1
 --- !u!4 &1113974556
 Transform:
   m_ObjectHideFlags: 0
