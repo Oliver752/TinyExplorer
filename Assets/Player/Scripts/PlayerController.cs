@@ -13,52 +13,49 @@ namespace UnityTutorial.PlayerControl
         [SerializeField] private Transform Camera;
         [SerializeField] private float UpperLimit = -40f;
         [SerializeField] private float BottomLimit = 70f;
-        [SerializeField] private float MouseSensitivity = 21.9f;
-        //[SerializeField, Range(10, 500)] private float JumpFactor = 260f;
-        //[SerializeField] private float Dis2Ground = 0.8f;
-        //[SerializeField] private LayerMask GroundCheck;
-        //[SerializeField] private float AirResistance = 0.8f;
+        [SerializeField] private float MouseSensitivity = 11.9f;
+        [SerializeField, Range(10, 500)] private float JumpFactor = 260f;
+        [SerializeField] private float Dis2Ground = 0.8f;
+        [SerializeField] private LayerMask GroundCheck;
+        [SerializeField] private float AirResistance = 0.8f;
         private Rigidbody _playerRigidbody;
         private InputManager _inputManager;
         private Animator _animator;
-        //private bool _grounded = false;
+        private bool _grounded = false;
         private bool _hasAnimator;
         private int _xVelHash;
         private int _yVelHash;
-        //private int _jumpHash;
-        //private int _groundHash;
-        //private int _fallingHash;
-        //private int _zVelHash;
+        private int _jumpHash;
+        private int _groundHash;
+        private int _fallingHash;
+        private int _zVelHash;
         //private int _crouchHash;
         private float _xRotation;
-
-        private const float _walkSpeed = 2f;
-        private const float _runSpeed = 6f;
+        [SerializeField] private const float _walkSpeed = 1f;
+        [SerializeField] private const float _runSpeed = 2f;
         private Vector2 _currentVelocity;
         
 
 
         private void Start() {
             _hasAnimator = TryGetComponent<Animator>(out _animator);
-
             _playerRigidbody = GetComponent<Rigidbody>();
             _inputManager = GetComponent<InputManager>();
 
 
             _xVelHash = Animator.StringToHash("X_Velocity");
             _yVelHash = Animator.StringToHash("Y_Velocity");
-            //_zVelHash = Animator.StringToHash("Z_Velocity");
-            //_jumpHash = Animator.StringToHash("Jump");
-            //_groundHash = Animator.StringToHash("Grounded");
-            //_fallingHash = Animator.StringToHash("Falling");
+            _zVelHash = Animator.StringToHash("Z_Velocity");
+            _jumpHash = Animator.StringToHash("Jump");
+            _groundHash = Animator.StringToHash("Grounded");
+            _fallingHash = Animator.StringToHash("Falling");
             //_crouchHash = Animator.StringToHash("Crouch");
-            
         }
 
         private void FixedUpdate() {
-            //SampleGround();
+            SampleGround();
             Move();
-            //HandleJump();
+            HandleJump();
             //HandleCrouch();
         }
         private void LateUpdate() {
@@ -68,12 +65,13 @@ namespace UnityTutorial.PlayerControl
         private void Move()
         {
             if(!_hasAnimator) return;
+
             float targetSpeed = _inputManager.Run ? _runSpeed : _walkSpeed;
             //if(_inputManager.Crouch) targetSpeed = 1.5f;
-            if(_inputManager.Move ==Vector2.zero) targetSpeed = 0.1f;
+            if(_inputManager.Move ==Vector2.zero) targetSpeed = 0;
 
-            //if(_grounded)
-            //{
+            if(_grounded)
+            {
                 
             _currentVelocity.x = Mathf.Lerp(_currentVelocity.x, _inputManager.Move.x * targetSpeed, AnimBlendSpeed * Time.fixedDeltaTime);
             _currentVelocity.y =  Mathf.Lerp(_currentVelocity.y, _inputManager.Move.y * targetSpeed, AnimBlendSpeed * Time.fixedDeltaTime);
@@ -82,11 +80,11 @@ namespace UnityTutorial.PlayerControl
             var zVelDifference = _currentVelocity.y - _playerRigidbody.linearVelocity.z;
 
             _playerRigidbody.AddForce(transform.TransformVector(new Vector3(xVelDifference, 0 , zVelDifference)), ForceMode.VelocityChange);
-            //}
-            //else
-            //{
-                //_playerRigidbody.AddForce(transform.TransformVector(new Vector3(_currentVelocity.x * AirResistance,0,_currentVelocity.y * AirResistance)), ForceMode.VelocityChange);
-            //}
+            }
+            else
+            {
+                _playerRigidbody.AddForce(transform.TransformVector(new Vector3(_currentVelocity.x * AirResistance,0,_currentVelocity.y * AirResistance)), ForceMode.VelocityChange);
+            }
 
 
             _animator.SetFloat(_xVelHash , _currentVelocity.x);
@@ -111,7 +109,7 @@ namespace UnityTutorial.PlayerControl
 
         //private void HandleCrouch() => _animator.SetBool(_crouchHash , _inputManager.Crouch);
 
-/*
+
         private void HandleJump()
         {
             if(!_hasAnimator) return;
@@ -157,16 +155,5 @@ namespace UnityTutorial.PlayerControl
             _animator.SetBool(_fallingHash, !_grounded);
             _animator.SetBool(_groundHash, _grounded);
         }
-        */
-        private void SampleGround()
-{
-    /*
-    _grounded = Physics.Raycast(_playerRigidbody.worldCenterOfMass,
-                                Vector3.down,
-                                0.8f + 0.1f,
-                                GroundCheck);
-                                */
-                                //_grounded = true;   // temporary
-}
     }
 }
