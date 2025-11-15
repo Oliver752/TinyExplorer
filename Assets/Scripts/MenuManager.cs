@@ -3,23 +3,9 @@ using UnityEngine.SceneManagement;
 
 public class MenuManager : MonoBehaviour
 {
-    // Call from UI Button OnClick()
-    public void StartGame(string sceneName)
+    public void StartGame()
     {
-        // load gameplay scene
-        SceneManager.LoadScene(sceneName);
+        SceneManager.LoadScene("Scene");
     }
-
-    public void QuitGame()
-    {
-        // Works in build; does nothing in editor
-        Application.Quit();
-    }
-
-    public void OpenOptions()
-    {
-        // show options UI or toggle a panel
-        // implement your options panel logic here
-        Debug.Log("Open Options clicked");
-    }
+    
 }
