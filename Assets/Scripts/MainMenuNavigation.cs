@@ -1,26 +1,46 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using TMPro;
 
 public class MainMenuNavigation : MonoBehaviour
 {
-    [SerializeField] private Button[] buttons;   // drag all menu buttons here, top-to-bottom
+    [SerializeField] private Button[] buttons;
     private int currentIndex = 0;
-    private Color highlightColor = new Color(1f, 0.5f, 0f, 1f); // Example highlight color (orange)
+
+    private Color normalTextColor = new Color(0.76f, 0.65f, 0.57f);
+    private Color highlightedTextColor = Color.white;
 
     void OnEnable()
     {
-        // make sure we have an EventSystem in the scene
         if (FindObjectOfType<EventSystem>() == null)
             new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
 
-        // highlight the first button
+        // Highlight initial button
         Highlight(currentIndex);
+
+        // Add hover + click listeners to each button
+        foreach (var button in buttons)
+        {
+            // Hover highlight
+            EventTrigger trigger = button.gameObject.GetComponent<EventTrigger>();
+            if (trigger == null)
+                trigger = button.gameObject.AddComponent<EventTrigger>();
+
+            EventTrigger.Entry entry = new EventTrigger.Entry
+            {
+                eventID = EventTriggerType.PointerEnter
+            };
+            entry.callback.AddListener((data) => { SetHighlight(button); });
+            trigger.triggers.Add(entry);
+
+            // Click highlight
+            button.onClick.AddListener(() => SetHighlight(button));
+        }
     }
 
     void Update()
     {
-        // keyboard navigation
         if (Input.GetKeyDown(KeyCode.DownArrow))
         {
             currentIndex = (currentIndex + 1) % buttons.Length;
@@ -32,36 +52,37 @@ public class MainMenuNavigation : MonoBehaviour
             Highlight(currentIndex);
         }
 
-        // activate highlighted button
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Return) ||
+            Input.GetKeyDown(KeyCode.KeypadEnter) ||
+            Input.GetKeyDown(KeyCode.Space))
         {
             buttons[currentIndex].onClick.Invoke();
         }
     }
 
-    // call this from each button’s OnClick() if you want mouse to update highlight too
     public void SetHighlight(Button b)
     {
         int idx = System.Array.IndexOf(buttons, b);
-        if (idx >= 0) { currentIndex = idx; Highlight(idx); }
+        if (idx >= 0)
+        {
+            currentIndex = idx;
+            Highlight(idx);
+        }
     }
 
     private void Highlight(int index)
     {
-        // deactivate all buttons
         for (int i = 0; i < buttons.Length; i++)
         {
-            ColorBlock colors = buttons[i].colors;
-            colors.normalColor = Color.black; // Set normal color to black
-            buttons[i].colors = colors;
-            buttons[i].interactable = false;
+            TextMeshProUGUI txt = buttons[i].GetComponentInChildren<TextMeshProUGUI>();
+            if (txt != null)
+                txt.color = normalTextColor;
         }
 
-        // activate the chosen button (triggers ColorTint transition -> Highlighted color)
-        ColorBlock highlightColors = buttons[index].colors;
-        highlightColors.normalColor = highlightColor; // Set normal color to highlight color
-        buttons[index].colors = highlightColors;
-        buttons[index].interactable = true;
+        TextMeshProUGUI highlightedTxt = buttons[index].GetComponentInChildren<TextMeshProUGUI>();
+        if (highlightedTxt != null)
+            highlightedTxt.color = highlightedTextColor;
+
         buttons[index].Select();
     }
 }
