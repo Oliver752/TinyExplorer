@@ -34,9 +34,11 @@ namespace UnityTutorial.PlayerControl
         private int _crouchHash;
         private float _xRotation;
 
+
         [SerializeField] private float _walkSpeed = 3f;
         [SerializeField] private float _runSpeed = 6f;
         private Vector2 _currentVelocity;
+        public bool canMove = true;
 
         // raw-mouse accumulation
         private float _accumMouseX;
@@ -71,57 +73,71 @@ namespace UnityTutorial.PlayerControl
         }
 
         private void CamMovements()
-        {
-            if (!_hasAnimator) return;
+{
+    // Stop camera movement if no animator or player cannot move
+    if (!_hasAnimator || !canMove) return;
 
-            Vector2 raw = Mouse.current.delta.ReadValue();
-            _accumMouseX += raw.x;
-            _accumMouseY += raw.y;
+    // Read raw mouse delta from new Input System
+    Vector2 raw = Mouse.current.delta.ReadValue();
 
-            const float pixelsPerDegree = 5.0f;
-            float dx = Mathf.Clamp(_accumMouseX, -50f, 50f) / pixelsPerDegree;
-            float dy = Mathf.Clamp(_accumMouseY, -50f, 50f) / pixelsPerDegree;
+    // Accumulate raw mouse movement
+    _accumMouseX += raw.x * MouseSensitivity;
+    _accumMouseY += raw.y * MouseSensitivity;
 
-            _accumMouseX -= dx * pixelsPerDegree;
-            _accumMouseY -= dy * pixelsPerDegree;
+    // Convert pixels to degrees
+    const float pixelsPerDegree = 5.0f;
+    float dx = Mathf.Clamp(_accumMouseX, -50f, 50f) / pixelsPerDegree;
+    float dy = Mathf.Clamp(_accumMouseY, -50f, 50f) / pixelsPerDegree;
 
-            Camera.position = CameraRoot.position;
+    // Subtract used delta
+    _accumMouseX -= dx * pixelsPerDegree;
+    _accumMouseY -= dy * pixelsPerDegree;
 
-            _xRotation -= dy;
-            _xRotation = Mathf.Clamp(_xRotation, UpperLimit, BottomLimit);
-            Camera.localRotation = Quaternion.Euler(_xRotation, 0f, 0f);
+    // Camera position follows player
+    Camera.position = CameraRoot.position;
 
-            _playerRigidbody.MoveRotation(
-                _playerRigidbody.rotation * Quaternion.Euler(0f, dx, 0f)
-            );
-        }
+    // Rotate camera vertically
+    _xRotation -= dy;
+    _xRotation = Mathf.Clamp(_xRotation, UpperLimit, BottomLimit);
+    Camera.localRotation = Quaternion.Euler(_xRotation, 0f, 0f);
 
-        private void Move()
-        {
-            if (!_hasAnimator) return;
+    // Rotate player horizontally
+    _playerRigidbody.MoveRotation(
+        _playerRigidbody.rotation * Quaternion.Euler(0f, dx, 0f)
+    );
+}
 
-            float targetSpeed = _inputManager.Run ? _runSpeed : _walkSpeed;
-            if (_inputManager.Crouch) targetSpeed = 2.5f;
-            if (_inputManager.Move == Vector2.zero) targetSpeed = 0;
+private void Move()
+{
+    // Stop movement if no animator or player cannot move
+    if (!_hasAnimator || !canMove) return;
 
-            if (_grounded)
-            {
-                _currentVelocity.x = Mathf.Lerp(_currentVelocity.x, _inputManager.Move.x * targetSpeed, AnimBlendSpeed * Time.fixedDeltaTime);
-                _currentVelocity.y = Mathf.Lerp(_currentVelocity.y, _inputManager.Move.y * targetSpeed, AnimBlendSpeed * Time.fixedDeltaTime);
+    // Determine target speed
+    float targetSpeed = _inputManager.Run ? _runSpeed : _walkSpeed;
+    if (_inputManager.Crouch) targetSpeed = 2.5f;
+    if (_inputManager.Move == Vector2.zero) targetSpeed = 0;
 
-                var xVelDifference = _currentVelocity.x - _playerRigidbody.linearVelocity.x;
-                var zVelDifference = _currentVelocity.y - _playerRigidbody.linearVelocity.z;
+    // Grounded movement
+    if (_grounded)
+    {
+        _currentVelocity.x = Mathf.Lerp(_currentVelocity.x, _inputManager.Move.x * targetSpeed, AnimBlendSpeed * Time.fixedDeltaTime);
+        _currentVelocity.y = Mathf.Lerp(_currentVelocity.y, _inputManager.Move.y * targetSpeed, AnimBlendSpeed * Time.fixedDeltaTime);
 
-                _playerRigidbody.AddForce(transform.TransformVector(new Vector3(xVelDifference, 0, zVelDifference)), ForceMode.VelocityChange);
-            }
-            else
-            {
-                _playerRigidbody.AddForce(transform.TransformVector(new Vector3(_currentVelocity.x * AirResistance, 0, _currentVelocity.y * AirResistance)), ForceMode.VelocityChange);
-            }
+        var xVelDifference = _currentVelocity.x - _playerRigidbody.linearVelocity.x;
+        var zVelDifference = _currentVelocity.y - _playerRigidbody.linearVelocity.z;
 
-            _animator.SetFloat(_xVelHash, _currentVelocity.x);
-            _animator.SetFloat(_yVelHash, _currentVelocity.y);
-        }
+        _playerRigidbody.AddForce(transform.TransformVector(new Vector3(xVelDifference, 0, zVelDifference)), ForceMode.VelocityChange);
+    }
+    else // Air movement
+    {
+        _playerRigidbody.AddForce(transform.TransformVector(new Vector3(_currentVelocity.x * AirResistance, 0, _currentVelocity.y * AirResistance)), ForceMode.VelocityChange);
+    }
+
+    // Update animator
+    _animator.SetFloat(_xVelHash, _currentVelocity.x);
+    _animator.SetFloat(_yVelHash, _currentVelocity.y);
+}
+
 
         private void HandleCrouch() => _animator.SetBool(_crouchHash, _inputManager.Crouch);
 
