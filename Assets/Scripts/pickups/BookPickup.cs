@@ -3,26 +3,47 @@ using UnityEngine.InputSystem;
 
 public class BookPickup : MonoBehaviour
 {
-    public float pickupRange = 0.3f;
+    public float pickupRange = 2f;
     public GameObject pressETipUI;
-    public GameObject book; // skript Book bude držať recepty a stav
+    public GameObject book;
 
     private Transform player;
     private bool pickedUp = false;
 
     void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player")?.transform;
         if (pressETipUI != null)
             pressETipUI.SetActive(false);
+
+        TryFindPlayer();
+    }
+
+    void TryFindPlayer()
+    {
+        GameObject p = GameObject.FindGameObjectWithTag("Player");
+        if (p != null)
+        {
+            player = p.transform;
+            Debug.Log("Player FOUND!");
+        }
+        else
+        {
+            Debug.Log("Player NOT FOUND — check tag!");
+        }
     }
 
     void Update()
     {
-        if (pickedUp || player == null) return;
+        if (pickedUp) return;
+
+        // If we still didn't find player, keep trying
+        if (player == null)
+        {
+            TryFindPlayer();
+            return;
+        }
 
         float distance = Vector3.Distance(transform.position, player.position);
-
         if (distance <= pickupRange)
         {
             if (pressETipUI != null)
@@ -41,16 +62,16 @@ public class BookPickup : MonoBehaviour
     }
 
     void Pickup()
-{
-    pickedUp = true;
-    if (pressETipUI != null)
-        pressETipUI.SetActive(false);
+    {
+        pickedUp = true;
+        if (pressETipUI != null)
+            pressETipUI.SetActive(false);
 
-    if (book != null)
-        book.SetActive(true); // aktivuje Page Curl panel
-    else
-        Debug.LogError("Book nie je priradený!");
+        if (book != null)
+            book.SetActive(true);
+        else
+            Debug.LogError("BOOK object not assigned!");
 
-    Destroy(gameObject); // kniha v scéne zmizne
-}
+        Destroy(gameObject);
+    }
 }

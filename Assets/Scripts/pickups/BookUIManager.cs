@@ -1,10 +1,10 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityTutorial.PlayerControl;
+using UnityEngine.EventSystems;
+using UnityTutorial.PlayerControl; // aby sa našiel PlayerController
 
-public class BookController : MonoBehaviour
+public class BookUIManager : MonoBehaviour
 {
-    [Header("UI Panel")]
+    [Header("References")]
     public GameObject bookUIPanel;
     public PlayerController playerController;
 
@@ -12,13 +12,13 @@ public class BookController : MonoBehaviour
 
     void Update()
     {
-        if (Keyboard.current.iKey.wasPressedThisFrame)
+        if (UnityEngine.InputSystem.Keyboard.current.iKey.wasPressedThisFrame)
         {
-            ToggleBook();
+            ToggleBookUI();
         }
     }
 
-    public void ToggleBook()
+    void ToggleBookUI()
     {
         isOpen = !isOpen;
 
@@ -28,15 +28,17 @@ public class BookController : MonoBehaviour
         if (isOpen)
         {
             if (playerController != null)
-                playerController.canMove = false; // zastaví pohyb a kameru
+                playerController.canMove = false;
 
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
+
+            EventSystem.current.sendNavigationEvents = true;
         }
         else
         {
             if (playerController != null)
-                playerController.canMove = true; // opäť povolí pohyb
+                playerController.canMove = true;
 
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
