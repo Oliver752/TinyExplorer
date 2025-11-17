@@ -133,20 +133,20 @@ public class TutorialManager : MonoBehaviour
     {
         if (tutorialPanel != null) tutorialPanel.SetActive(true);
         if (tutorialText != null)
-            tutorialText.text = "Použite šípky alebo klávesy WASD na pohyb";
+            tutorialText.text = "Find the green glowing book";
     }
 
     void ShowJumpText()
     {
         if (tutorialPanel != null) tutorialPanel.SetActive(true);
         if (tutorialText != null)
-            tutorialText.text = "Stlačte SPACE, aby ste skočili";
+            tutorialText.text = "  ";
     }
 
     void ShowInteractText()
     {
         if (tutorialPanel != null) tutorialPanel.SetActive(true);
         if (tutorialText != null)
-            tutorialText.text = "Stlačte E, aby ste zdvihli predmety";
+            tutorialText.text = "   ";
     }
 }
