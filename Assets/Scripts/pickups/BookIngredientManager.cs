@@ -8,32 +8,105 @@ public class BookIngredientManager : MonoBehaviour
     {
         public string ingredientName;
         public bool unlocked;
-        public UIIngredientSlot uiSlot; // assigned automatically
+        public int pageIndex = 0;
+        [HideInInspector] public UIIngredientSlot uiSlot;
     }
 
     [Header("Ingredient List")]
     public List<Ingredient> ingredients = new List<Ingredient>();
 
     [Header("UI")]
-    public Transform slotParent;            // Parent object where slots will spawn
-    public UIIngredientSlot slotPrefab;     // Prefab of the ingredient row
+    public UIIngredientSlot slotPrefab;
+    public Book book;
+
+    private Dictionary<int, List<UIIngredientSlot>> pageSlots = new Dictionary<int, List<UIIngredientSlot>>();
 
     void Start()
     {
+        if (!book)
+            book = GetComponent<Book>();
+
         GenerateUI();
+        UpdatePageVisibility();
+
+        if (book != null)
+            book.OnFlip.AddListener(UpdatePageVisibility);
     }
 
     void GenerateUI()
     {
-        foreach (Transform child in slotParent)
-            Destroy(child.gameObject);
+        pageSlots.Clear();
 
         foreach (var ing in ingredients)
         {
-            UIIngredientSlot slot = Instantiate(slotPrefab, slotParent);
-            ing.uiSlot = slot;
+            UIIngredientSlot slot = Instantiate(slotPrefab);
             slot.ingredientText.text = ing.ingredientName;
             slot.SetUnlocked(ing.unlocked);
+            ing.uiSlot = slot;
+
+            Transform parent = GetParentForPage(ing.pageIndex);
+            slot.transform.SetParent(parent, false);
+
+            if (!pageSlots.ContainsKey(ing.pageIndex))
+                pageSlots[ing.pageIndex] = new List<UIIngredientSlot>();
+            pageSlots[ing.pageIndex].Add(slot);
+        }
+
+        // ⬇️ AUTO-POSITION SLOTS VERTICALLY ON EACH PAGE
+        foreach (var page in pageSlots)
+        {
+            float yOffset = -20f;   // First slot position
+            float spacing = -35f;   // Distance between slots
+
+            foreach (var slot in page.Value)
+            {
+                RectTransform rt = slot.GetComponent<RectTransform>();
+                rt.anchoredPosition = new Vector2(0, yOffset);
+                yOffset += spacing;
+            }
+        }
+    }
+
+    Transform GetParentForPage(int pageIndex)
+    {
+        if (book.currentPage == pageIndex)
+            return book.Right.rectTransform;
+        else if (book.currentPage - 1 == pageIndex)
+            return book.Left.rectTransform;
+        else if (book.currentPage + 1 == pageIndex)
+            return book.RightNext.rectTransform;
+        else if (book.currentPage - 2 == pageIndex)
+            return book.LeftNext.rectTransform;
+
+        GameObject placeholder = new GameObject("Page" + pageIndex);
+        placeholder.transform.SetParent(book.BookPanel, false);
+        placeholder.SetActive(false);
+        return placeholder.transform;
+    }
+
+    void UpdatePageVisibility()
+    {
+        int[] visiblePages = new int[]
+        {
+            book.currentPage - 1,
+            book.currentPage,
+            book.currentPage - 2,
+            book.currentPage + 1
+        };
+
+        foreach (var kvp in pageSlots)
+        {
+            bool isVisible = System.Array.Exists(visiblePages, p => p == kvp.Key);
+            foreach (var slot in kvp.Value)
+                slot.gameObject.SetActive(isVisible);
+        }
+
+        foreach (int page in visiblePages)
+        {
+            if (!pageSlots.ContainsKey(page)) continue;
+            Transform parent = GetParentForPage(page);
+            foreach (var slot in pageSlots[page])
+                slot.transform.SetParent(parent, false);
         }
     }
 
@@ -43,7 +116,8 @@ public class BookIngredientManager : MonoBehaviour
         if (ing != null)
         {
             ing.unlocked = true;
-            ing.uiSlot.SetUnlocked(true);
+            if (ing.uiSlot != null)
+                ing.uiSlot.SetUnlocked(true);
         }
         else
         {

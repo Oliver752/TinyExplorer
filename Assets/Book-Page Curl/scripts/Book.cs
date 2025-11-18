@@ -15,7 +15,8 @@ public enum FlipMode
 public class Book : MonoBehaviour {
     public Canvas canvas;
     [SerializeField]
-    RectTransform BookPanel;
+    [Header("Book Panel")]
+    public RectTransform BookPanel;
     public Sprite background;
     public Sprite[] bookPages;
     public bool interactable=true;
@@ -50,6 +51,7 @@ public class Book : MonoBehaviour {
     public Image Right;
     public Image RightNext;
     public UnityEvent OnFlip;
+    
     float radius1, radius2;
     //Spine Bottom
     Vector3 sb;
