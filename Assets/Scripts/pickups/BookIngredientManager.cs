@@ -34,38 +34,46 @@ public class BookIngredientManager : MonoBehaviour
     }
 
     void GenerateUI()
+{
+    pageSlots.Clear();
+
+    foreach (var ing in ingredients)
     {
-        pageSlots.Clear();
+        UIIngredientSlot slot = Instantiate(slotPrefab);
+        slot.ingredientText.text = ing.ingredientName;
 
-        foreach (var ing in ingredients)
+        // ✔ Zarovnanie textu doľava bez menenia pozície slotov
+        slot.ingredientText.alignment = TMPro.TextAlignmentOptions.Left;
+
+        // 🔹 Make text black
+        slot.ingredientText.color = Color.black;
+
+        slot.SetUnlocked(ing.unlocked);
+        ing.uiSlot = slot;
+
+        Transform parent = GetParentForPage(ing.pageIndex);
+        slot.transform.SetParent(parent, false);
+
+        if (!pageSlots.ContainsKey(ing.pageIndex))
+            pageSlots[ing.pageIndex] = new List<UIIngredientSlot>();
+        pageSlots[ing.pageIndex].Add(slot);
+    }
+
+    // Auto vertical spacing
+    foreach (var page in pageSlots)
+    {
+        float yOffset = -20f;
+        float spacing = -80f;
+
+        foreach (var slot in page.Value)
         {
-            UIIngredientSlot slot = Instantiate(slotPrefab);
-            slot.ingredientText.text = ing.ingredientName;
-            slot.SetUnlocked(ing.unlocked);
-            ing.uiSlot = slot;
-
-            Transform parent = GetParentForPage(ing.pageIndex);
-            slot.transform.SetParent(parent, false);
-
-            if (!pageSlots.ContainsKey(ing.pageIndex))
-                pageSlots[ing.pageIndex] = new List<UIIngredientSlot>();
-            pageSlots[ing.pageIndex].Add(slot);
-        }
-
-        // ⬇️ AUTO-POSITION SLOTS VERTICALLY ON EACH PAGE
-        foreach (var page in pageSlots)
-        {
-            float yOffset = -20f;   // First slot position
-            float spacing = -35f;   // Distance between slots
-
-            foreach (var slot in page.Value)
-            {
-                RectTransform rt = slot.GetComponent<RectTransform>();
-                rt.anchoredPosition = new Vector2(0, yOffset);
-                yOffset += spacing;
-            }
+            RectTransform rt = slot.GetComponent<RectTransform>();
+            rt.anchoredPosition = new Vector2(0, yOffset);
+            yOffset += spacing;
         }
     }
+}
+
 
     Transform GetParentForPage(int pageIndex)
     {
@@ -111,17 +119,24 @@ public class BookIngredientManager : MonoBehaviour
     }
 
     public void UnlockIngredient(string ingredientName)
+{
+    var ing = ingredients.Find(i => i.ingredientName == ingredientName);
+    if (ing != null)
     {
-        var ing = ingredients.Find(i => i.ingredientName == ingredientName);
-        if (ing != null)
-        {
-            ing.unlocked = true;
-            if (ing.uiSlot != null)
-                ing.uiSlot.SetUnlocked(true);
-        }
-        else
-        {
-            Debug.LogWarning($"Ingredient '{ingredientName}' not found in BookIngredientManager list.");
-        }
+        ing.unlocked = true;
+
+        if (ing.uiSlot != null)
+            ing.uiSlot.SetUnlocked(true);
+
+        Debug.Log($"Ingredient UNLOCKED → {ingredientName}");
+
+        // 🔥 okamžitá aktualizácia UI
+        UpdatePageVisibility();
     }
+    else
+    {
+        Debug.LogWarning($"Ingredient '{ingredientName}' not found!");
+    }
+}
+
 }
