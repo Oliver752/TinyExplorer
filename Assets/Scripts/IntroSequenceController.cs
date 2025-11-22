@@ -14,25 +14,42 @@ public class DialogueEntry
 
 public class IntroSequenceController : MonoBehaviour
 {
-    [Header("References")] public Camera introCamera; public SplinePath path; public GameObject player;
-    public Transform spawnPoint; public Camera gameplayCamera; public TutorialManager tutorialManager;
+    [Header("Intro Audio")]
+    public AudioSource introAudioSource;   
+    public AudioClip introMusic;
+    public AudioClip secondMusic;
+    public float audioVolume = 0.6f;
 
-    [Header("UI")] public TextMeshProUGUI dialogueText; public CanvasGroup dialogueCanvasGroup;
+    [Header("References")]
+    public Camera introCamera;
+    public SplinePath path;
+    public GameObject player;
+    public Transform spawnPoint;
+    public Camera gameplayCamera;
+    public TutorialManager tutorialManager;
 
-    [Header("Full Screen Fade")] public CanvasGroup fullScreenFadeCanvasGroup;
+    [Header("UI")]
+    public TextMeshProUGUI dialogueText;
+    public CanvasGroup dialogueCanvasGroup;
+
+    [Header("Full Screen Fade")]
+    public CanvasGroup fullScreenFadeCanvasGroup;
     public float initialHoldDuration = 2f, initialFadeDuration = 1f, finalFadeDuration = 1f, finalHoldDuration = 0.5f;
 
-    [Header("Post-Processing")] public UnityEngine.Rendering.Volume postProcessVolume;
+    [Header("Post-Processing")]
+    public UnityEngine.Rendering.Volume postProcessVolume;
     private UnityEngine.Rendering.Universal.DepthOfField depthOfField;
 
-    [Header("Timing")] public float introDuration = 10f; public float lookAheadAmount = 0.05f;
+    [Header("Timing")]
+    public float introDuration = 10f;
+    public float lookAheadAmount = 0.05f;
     public List<DialogueEntry> dialogueEntries = new List<DialogueEntry>();
 
     private Coroutine introCoroutine;
-    private Coroutine currentDialogueFade; // cache dialogue fades
+    private Coroutine currentDialogueFade;
     private bool introFinished = false;
+    private bool isPaused = false;
 
-    // optional: cache FreeCamera on gameplay camera to keep it disabled during intro
     private FreeCamera cachedFreeCam;
 
     void Start()
@@ -40,15 +57,15 @@ public class IntroSequenceController : MonoBehaviour
         if (introCamera)
         {
             introCamera.gameObject.SetActive(true);
-            introCamera.targetDisplay = 0; // Display 1
+            introCamera.targetDisplay = 0;
         }
 
         if (gameplayCamera)
         {
             cachedFreeCam = gameplayCamera.GetComponent<FreeCamera>();
-            if (cachedFreeCam) cachedFreeCam.enabled = false; // no player cam movement during intro
+            if (cachedFreeCam) cachedFreeCam.enabled = false;
             gameplayCamera.gameObject.SetActive(false);
-            gameplayCamera.targetDisplay = 0; // Display 1
+            gameplayCamera.targetDisplay = 0;
         }
 
         if (player) player.SetActive(false);
@@ -62,7 +79,35 @@ public class IntroSequenceController : MonoBehaviour
             introCamera.transform.LookAt(path.GetPoint(lookAheadAmount));
         }
 
+        if (introAudioSource != null && introMusic != null)
+            StartCoroutine(PlayIntroAudioSequence());
+
         introCoroutine = StartCoroutine(PlayIntro());
+    }
+
+    public void PauseIntro() => isPaused = true;
+    public void ResumeIntro() => isPaused = false;
+
+    IEnumerator PlayIntroAudioSequence()
+    {
+        introAudioSource.clip = introMusic;
+        introAudioSource.volume = audioVolume;
+        introAudioSource.loop = false;
+        introAudioSource.Play();
+
+        yield return new WaitForSeconds(introAudioSource.clip.length);
+
+        if (secondMusic != null)
+        {
+            introAudioSource.clip = secondMusic;
+            introAudioSource.volume = audioVolume;
+            introAudioSource.loop = false;
+            introAudioSource.Play();
+            yield return new WaitForSeconds(introAudioSource.clip.length);
+        }
+
+        if (GameMusicManager.instance != null)
+            GameMusicManager.instance.PlayMusic();
     }
 
     IEnumerator PlayIntro()
@@ -73,7 +118,14 @@ public class IntroSequenceController : MonoBehaviour
             dialogueText.text = dialogueEntries[0].text;
             currentDialogueFade = StartCoroutine(FadeCanvasGroup(dialogueCanvasGroup, 0f, 1f, 1f));
         }
-        yield return new WaitForSeconds(initialHoldDuration);
+
+        float elapsedHold = 0f;
+        while (elapsedHold < initialHoldDuration)
+        {
+            if (!isPaused)
+                elapsedHold += Time.deltaTime;
+            yield return null;
+        }
 
         if (dialogueEntries.Count > 0)
         {
@@ -81,35 +133,53 @@ public class IntroSequenceController : MonoBehaviour
             yield return FadeCanvasGroup(dialogueCanvasGroup, 1f, 0f, 0.5f);
         }
 
-        // Phase 2: Fade From Black
+        // Phase 2: Fade from Black
         if (fullScreenFadeCanvasGroup)
-            yield return FadeCanvasGroup(fullScreenFadeCanvasGroup, 1f, 0f, initialFadeDuration);
+        {
+            float timer = 0f;
+            while (timer < initialFadeDuration)
+            {
+                if (!isPaused)
+                    timer += Time.deltaTime;
+                fullScreenFadeCanvasGroup.alpha = 1f - (timer / initialFadeDuration);
+                yield return null;
+            }
+            fullScreenFadeCanvasGroup.alpha = 0f;
+        }
 
-        // Phase 3: Main Camera Path
-        float mainElapsed = 0f; int dialogueIndex = 1; string lastDialogueText = "";
+        // Phase 3: Camera Path & Dialogue
+        float mainElapsed = 0f;
+        int dialogueIndex = 1;
+        string lastDialogueText = "";
+
         while (mainElapsed < introDuration)
         {
-            mainElapsed += Time.deltaTime; float t = mainElapsed / introDuration;
-
-            Vector3 cameraPos = path.GetPoint(t); introCamera.transform.position = cameraPos;
-            introCamera.transform.LookAt(path.GetPoint(Mathf.Clamp01(t + lookAheadAmount)));
-
-            // Dialogue
-            if (dialogueIndex < dialogueEntries.Count)
+            if (!isPaused)
             {
-                var entry = dialogueEntries[dialogueIndex];
-                if (mainElapsed >= entry.displayTime && lastDialogueText != entry.text)
-                {
-                    Debug.Log($"Showing dialogue: '{entry.text}' at time {mainElapsed}");
-                    if (currentDialogueFade != null) StopCoroutine(currentDialogueFade);
-                    if (dialogueCanvasGroup.alpha > 0f) yield return FadeCanvasGroup(dialogueCanvasGroup, 1f, 0f, 0.3f);
-                    dialogueText.text = entry.text; lastDialogueText = entry.text;
-                    currentDialogueFade = StartCoroutine(FadeCanvasGroup(dialogueCanvasGroup, 0f, 1f, entry.fadeDuration));
-                    dialogueIndex++;
-                }
-            }
+                mainElapsed += Time.deltaTime;
+                float t = mainElapsed / introDuration;
 
-            if (depthOfField != null) depthOfField.focalLength.value = Mathf.Lerp(10f, 150f, t);
+                Vector3 cameraPos = path.GetPoint(t);
+                introCamera.transform.position = cameraPos;
+                introCamera.transform.LookAt(path.GetPoint(Mathf.Clamp01(t + lookAheadAmount)));
+
+                // Dialogue
+                if (dialogueIndex < dialogueEntries.Count)
+                {
+                    var entry = dialogueEntries[dialogueIndex];
+                    if (mainElapsed >= entry.displayTime && lastDialogueText != entry.text)
+                    {
+                        if (currentDialogueFade != null) StopCoroutine(currentDialogueFade);
+                        if (dialogueCanvasGroup.alpha > 0f) yield return FadeCanvasGroup(dialogueCanvasGroup, 1f, 0f, 0.3f);
+                        dialogueText.text = entry.text;
+                        lastDialogueText = entry.text;
+                        currentDialogueFade = StartCoroutine(FadeCanvasGroup(dialogueCanvasGroup, 0f, 1f, entry.fadeDuration));
+                        dialogueIndex++;
+                    }
+                }
+
+                if (depthOfField != null) depthOfField.focalLength.value = Mathf.Lerp(10f, 150f, t);
+            }
             yield return null;
         }
 
@@ -119,57 +189,14 @@ public class IntroSequenceController : MonoBehaviour
         if (fullScreenFadeCanvasGroup) yield return FadeCanvasGroup(fullScreenFadeCanvasGroup, 0f, 1f, finalFadeDuration);
         yield return new WaitForSeconds(finalHoldDuration);
 
-        // Phase 5: Transition to gameplay and fade back
-
-        // 1) Put the player at the spawn BEFORE activation so it doesn't update at old position
+        // Phase 5: Transition to gameplay
         if (player)
         {
             player.transform.position = spawnPoint.position;
             player.transform.rotation = spawnPoint.rotation;
+            player.SetActive(true);
         }
 
-        // 2) Activate the player
-        if (player) player.SetActive(true);
-
-        // 3) Ensure gameplay camera renders (turn on first), then enable any free-cam
-        if (gameplayCamera)
-        {
-            gameplayCamera.gameObject.SetActive(true);
-            gameplayCamera.enabled = true; // ensure Camera component is on
-        }
-        if (cachedFreeCam) cachedFreeCam.enabled = true;
-
-        // 4) Let gameplay camera render one frame before disabling intro camera
-        yield return null;
-
-        // 5) Now disable the intro camera (avoids "No cameras rendering")
-        if (introCamera) introCamera.gameObject.SetActive(false);
-
-        // 6) Fade back from black
-        if (fullScreenFadeCanvasGroup)
-            yield return FadeCanvasGroup(fullScreenFadeCanvasGroup, 1f, 0f, initialFadeDuration);
-
-        if (postProcessVolume) postProcessVolume.enabled = false;
-        introFinished = true;
-        Debug.Log("Intro Complete!");
-        if (tutorialManager != null){
-            tutorialManager.StartTutorial();
-        }
-    }
-
-    IEnumerator TransitionToGameplay()
-    {
-        // Put player at spawn BEFORE activation
-        if (player)
-        {
-            player.transform.position = spawnPoint.position;
-            player.transform.rotation = spawnPoint.rotation;
-        }
-
-        // Activate player
-        if (player) player.SetActive(true);
-
-        // Make sure gameplay camera actually renders
         if (gameplayCamera)
         {
             gameplayCamera.gameObject.SetActive(true);
@@ -177,19 +204,18 @@ public class IntroSequenceController : MonoBehaviour
         }
         if (cachedFreeCam) cachedFreeCam.enabled = true;
 
-        // Allow one frame with gameplay camera on
         yield return null;
 
-        // Disable intro camera and fade back
         if (introCamera) introCamera.gameObject.SetActive(false);
         if (fullScreenFadeCanvasGroup)
             yield return FadeCanvasGroup(fullScreenFadeCanvasGroup, 1f, 0f, initialFadeDuration);
 
         if (postProcessVolume) postProcessVolume.enabled = false;
-        Debug.Log("Intro Complete!");
-        if (tutorialManager != null){
-            tutorialManager.StartTutorial();
-        }
+        introFinished = true;
+
+        if (tutorialManager != null) tutorialManager.StartTutorial();
+
+        if (GameMusicManager.instance != null) GameMusicManager.instance.PlayMusic();
     }
 
     IEnumerator FadeCanvasGroup(CanvasGroup cg, float startAlpha, float endAlpha, float duration)
@@ -197,32 +223,11 @@ public class IntroSequenceController : MonoBehaviour
         if (cg == null || duration <= 0f) yield break;
         float timer = 0f;
         while (timer < duration)
-        { timer += Time.deltaTime; cg.alpha = Mathf.Lerp(startAlpha, endAlpha, timer / duration); yield return null; }
-        cg.alpha = endAlpha;
-    }
-
-    void Update()
-    {
-        if (introFinished) return;
-
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
         {
-            if (introCoroutine != null)
-            {
-                if (currentDialogueFade != null) StopCoroutine(currentDialogueFade);
-                dialogueCanvasGroup.alpha = 0f;
-
-                StopCoroutine(introCoroutine);
-                StartCoroutine(SkipIntro());
-            }
+            if (!isPaused) timer += Time.deltaTime;
+            cg.alpha = Mathf.Lerp(startAlpha, endAlpha, timer / duration);
+            yield return null;
         }
-    }
-
-    IEnumerator SkipIntro()
-    {
-        if (fullScreenFadeCanvasGroup) fullScreenFadeCanvasGroup.alpha = 1f;
-        yield return new WaitForSeconds(0.1f);
-        yield return StartCoroutine(TransitionToGameplay());
-        introFinished = true;
+        cg.alpha = endAlpha;
     }
 }

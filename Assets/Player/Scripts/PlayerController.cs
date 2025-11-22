@@ -34,7 +34,6 @@ namespace UnityTutorial.PlayerControl
         private int _crouchHash;
         private float _xRotation;
 
-
         [SerializeField] private float _walkSpeed = 3f;
         [SerializeField] private float _runSpeed = 6f;
         private Vector2 _currentVelocity;
@@ -43,6 +42,18 @@ namespace UnityTutorial.PlayerControl
         // raw-mouse accumulation
         private float _accumMouseX;
         private float _accumMouseY;
+
+
+       [SerializeField] private AudioSource footstepSource;
+[SerializeField] private AudioClip footstepClipA;
+[SerializeField] private AudioClip footstepClipB;
+
+private bool playFirstStep = true;
+
+[SerializeField] private float footstepInterval = 0.4f;
+
+private float footstepTimer = 0f;
+private bool useFirstFoot = true; // pre striedanie krokov
 
         private void Start()
         {
@@ -65,12 +76,14 @@ namespace UnityTutorial.PlayerControl
             Move();
             HandleJump();
             HandleCrouch();
+            HandleFootsteps();   // ← PRIDANÉ
         }
 
         private void LateUpdate()
         {
             CamMovements();
         }
+
 
         private void CamMovements()
 {
@@ -177,5 +190,47 @@ private void Move()
             _animator.SetBool(_fallingHash, !_grounded);
             _animator.SetBool(_groundHash, _grounded);
         }
+
+private void HandleFootsteps()
+{
+    if (!_grounded) return;
+    if (_inputManager.Move == Vector2.zero) return;
+
+    // --- ŽIADNY PITCH, zvuk ostáva rovnaký ---
+    footstepSource.pitch = 1f;
+
+    // --- Interval podľa pohybu ---
+    float interval = footstepInterval;
+
+    if (_inputManager.Run)
+    {
+        interval *= 0.55f;   // rýchlejšie kroky
+    }
+    else if (_inputManager.Crouch)
+    {
+        interval *= 1.4f;    // pomalšie kroky
+    }
+
+    footstepTimer -= Time.deltaTime;
+
+    if (footstepTimer <= 0f)
+    {
+        AudioClip clipToPlay = playFirstStep ? footstepClipA : footstepClipB;
+
+        if (clipToPlay != null)
+            footstepSource.PlayOneShot(clipToPlay);
+
+        playFirstStep = !playFirstStep;  // striedanie A ↔ B
+
+        footstepTimer = interval;
+    }
+}
+
+
+
+
+
+
+
     }
 }
