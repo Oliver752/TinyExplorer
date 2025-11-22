@@ -1,19 +1,23 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PauseMenuController : MonoBehaviour
 {
     [Header("References")]
-    public GameObject menuRoot; // your PausePanel
+    public GameObject menuRoot; // PausePanel
+    public IntroSequenceController introController;
 
     [Header("Settings")]
     public KeyCode toggleKey = KeyCode.P;
     public bool pauseAudioListener = true;
 
-    public static bool IsPaused { get; private set; }  // <-- GLOBAL FLAG
+    public static bool IsPaused { get; set; }
 
     void Start()
     {
-        if (menuRoot != null) menuRoot.SetActive(false);
+        if (menuRoot != null) 
+            menuRoot.SetActive(false);
+
         SetPaused(false, immediate: true);
     }
 
@@ -38,19 +42,49 @@ public class PauseMenuController : MonoBehaviour
 
     void SetPaused(bool pause, bool immediate = false)
     {
-        IsPaused = pause;                                 // <-- set global
+        IsPaused = pause;
 
-        if (menuRoot != null) menuRoot.SetActive(pause);
+        if (menuRoot != null) 
+            menuRoot.SetActive(pause);
 
         Time.timeScale = pause ? 0f : 1f;
-        if (pauseAudioListener) AudioListener.pause = pause;
+        if (pauseAudioListener) 
+            AudioListener.pause = pause;
 
         Cursor.visible = pause;
         Cursor.lockState = pause ? CursorLockMode.None : CursorLockMode.Locked;
+
+        if (introController != null)
+        {
+            if (pause) introController.PauseIntro();
+            else introController.ResumeIntro();
+        }
     }
 
     void OnDestroy()
     {
         if (IsPaused) SetPaused(false, immediate: true);
     }
+
+    // RETURN TO MAIN MENU
+    public void ReturnToMainMenu()
+    {
+        PlayerPrefs.SetString("SavedScene", SceneManager.GetActiveScene().name);
+        PlayerPrefs.Save();
+
+        Time.timeScale = 1f;
+        AudioListener.pause = false;
+        IsPaused = false;
+
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
+        if (menuRoot != null) 
+            menuRoot.SetActive(false);
+
+        SceneManager.LoadScene("MainMenu");
+        
+    }
+
+    
 }

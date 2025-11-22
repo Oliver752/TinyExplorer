@@ -20,10 +20,18 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private Slider musicSlider;
     [SerializeField] private Slider sfxSlider;
 
+    [Header("Continue Button")]
+    [SerializeField] private Button continueButton;
+
+    const string SAVE_KEY = "SavedScene";
+
     void Start()
     {
         mainMenuPanel.SetActive(true);
         settingsPanel.SetActive(false);
+        
+        if (continueButton != null)
+            continueButton.gameObject.SetActive(PlayerPrefs.HasKey(SAVE_KEY));
 
         float savedMusicVolume = PlayerPrefs.GetFloat("MusicVolume", 0.6f);
         float savedSFXVolume = PlayerPrefs.GetFloat("SFXVolume", 0.8f);
@@ -40,10 +48,8 @@ public class MenuManager : MonoBehaviour
             sfxSlider.onValueChanged.AddListener(SetSFXVolume);
         }
 
-        if (musicSource != null)
-            musicSource.volume = savedMusicVolume;
-        if (uiAudioSource != null)
-            uiAudioSource.volume = savedSFXVolume;
+        if (musicSource != null) musicSource.volume = savedMusicVolume;
+        if (uiAudioSource != null) uiAudioSource.volume = savedSFXVolume;
 
         PlayMenuMusic();
     }
@@ -53,7 +59,19 @@ public class MenuManager : MonoBehaviour
     public void StartGame()
     {
         PlayClickSound();
+        PlayerPrefs.SetString(SAVE_KEY, "Scene"); // uloží scénu
         SceneManager.LoadScene("Scene");
+    }
+
+    public void ContinueGame()
+    {
+        PlayClickSound();
+
+        if (PlayerPrefs.HasKey(SAVE_KEY))
+        {
+            string sceneToLoad = PlayerPrefs.GetString(SAVE_KEY);
+            SceneManager.LoadScene(sceneToLoad);
+        }
     }
 
     public void QuitGame()
@@ -77,7 +95,6 @@ public class MenuManager : MonoBehaviour
     }
 
     // ------------------- SOUND -------------------
-
 
     public void PlayClickSound()
     {
