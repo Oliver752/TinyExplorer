@@ -11,7 +11,7 @@ public class Bullet : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.velocity = transform.forward * speed;
+        rb.linearVelocity = transform.forward * speed;
         rb.useGravity = false;
 
         Destroy(gameObject, lifeTime);
