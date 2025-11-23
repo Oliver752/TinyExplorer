@@ -87,8 +87,11 @@ private bool useFirstFoot = true; // pre striedanie krokov
 
         private void CamMovements()
 {
-    // Stop camera movement if no animator or player cannot move
-    if (!_hasAnimator || !canMove) return;
+    // Stop camera movement if:
+    // - no animator
+    // - player cannot move
+    // - game is paused via PauseMenuController
+    if (!_hasAnimator || !canMove || PauseMenuController.IsPaused) return;
 
     // Read raw mouse delta from new Input System
     Vector2 raw = Mouse.current.delta.ReadValue();
@@ -119,6 +122,7 @@ private bool useFirstFoot = true; // pre striedanie krokov
         _playerRigidbody.rotation * Quaternion.Euler(0f, dx, 0f)
     );
 }
+
 
 private void Move()
 {

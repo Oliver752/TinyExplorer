@@ -1,21 +1,29 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Video;
+using UnityTutorial.PlayerControl;   // needed for PlayerController
 
 public class PauseMenuController : MonoBehaviour
 {
+    [Header("Video Background")]
+    public VideoPlayer pauseBackgroundVideo;      // video on the pause panel
+
+    [Header("Player Control")]
+    public PlayerController playerController;     // needed to disable camera/movement
+
     [Header("References")]
     public GameObject menuRoot; // PausePanel
     public IntroSequenceController introController;
 
     [Header("Settings")]
     public KeyCode toggleKey = KeyCode.P;
-    public bool pauseAudioListener = true;
+    public bool pauseAudioListener = true; // <- no longer used in SetPaused, can delete if you want
 
     public static bool IsPaused { get; set; }
 
     void Start()
     {
-        if (menuRoot != null) 
+        if (menuRoot != null)
             menuRoot.SetActive(false);
 
         SetPaused(false, immediate: true);
@@ -44,15 +52,29 @@ public class PauseMenuController : MonoBehaviour
     {
         IsPaused = pause;
 
-        if (menuRoot != null) 
+        if (menuRoot != null)
             menuRoot.SetActive(pause);
 
+        // Freeze gameplay, but NOT audio
         Time.timeScale = pause ? 0f : 1f;
-        if (pauseAudioListener) 
-            AudioListener.pause = pause;
+
+        // 🔇 REMOVED: this was muting music & clicks
+        // if (pauseAudioListener)
+        //     AudioListener.pause = pause;
 
         Cursor.visible = pause;
         Cursor.lockState = pause ? CursorLockMode.None : CursorLockMode.Locked;
+
+        // Freeze/unfreeze player camera & movement
+        if (playerController != null)
+            playerController.canMove = !pause;
+
+        // Play or pause the background video
+        if (pauseBackgroundVideo != null)
+        {
+            if (pause) pauseBackgroundVideo.Play();
+            else pauseBackgroundVideo.Pause();
+        }
 
         if (introController != null)
         {
@@ -73,18 +95,17 @@ public class PauseMenuController : MonoBehaviour
         PlayerPrefs.Save();
 
         Time.timeScale = 1f;
+
+        // Safety reset, fine to keep
         AudioListener.pause = false;
         IsPaused = false;
 
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
 
-        if (menuRoot != null) 
+        if (menuRoot != null)
             menuRoot.SetActive(false);
 
         SceneManager.LoadScene("MainMenu");
-        
     }
-
-    
 }

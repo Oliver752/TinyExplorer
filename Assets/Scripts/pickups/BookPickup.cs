@@ -26,10 +26,6 @@ public class BookPickup : MonoBehaviour
             player = p.transform;
             Debug.Log("Player FOUND!");
         }
-        else
-        {
-            Debug.Log("Player NOT FOUND — check tag!");
-        }
     }
 
     void Update()
