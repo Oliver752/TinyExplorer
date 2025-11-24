@@ -19,12 +19,18 @@ public class BookIngredientManager : MonoBehaviour
     public UIIngredientSlot slotPrefab;
     public Book book;
 
+    [Header("Win UI")]
+    public GameObject winPanel; // Assign this in inspector
+
     private Dictionary<int, List<UIIngredientSlot>> pageSlots = new Dictionary<int, List<UIIngredientSlot>>();
 
     void Start()
     {
         if (!book)
             book = GetComponent<Book>();
+
+        if (winPanel != null)
+            winPanel.SetActive(false); // Hide at start
 
         GenerateUI();
         UpdatePageVisibility();
@@ -34,46 +40,44 @@ public class BookIngredientManager : MonoBehaviour
     }
 
     void GenerateUI()
-{
-    pageSlots.Clear();
-
-    foreach (var ing in ingredients)
     {
-        UIIngredientSlot slot = Instantiate(slotPrefab);
-        slot.ingredientText.text = ing.ingredientName;
+        pageSlots.Clear();
 
-        // ✔ Zarovnanie textu doľava bez menenia pozície slotov
-        slot.ingredientText.alignment = TMPro.TextAlignmentOptions.Left;
-
-        // 🔹 Make text black
-        slot.ingredientText.color = Color.black;
-
-        slot.SetUnlocked(ing.unlocked);
-        ing.uiSlot = slot;
-
-        Transform parent = GetParentForPage(ing.pageIndex);
-        slot.transform.SetParent(parent, false);
-
-        if (!pageSlots.ContainsKey(ing.pageIndex))
-            pageSlots[ing.pageIndex] = new List<UIIngredientSlot>();
-        pageSlots[ing.pageIndex].Add(slot);
-    }
-
-    // Auto vertical spacing
-    foreach (var page in pageSlots)
-    {
-        float yOffset = -20f;
-        float spacing = -80f;
-
-        foreach (var slot in page.Value)
+        foreach (var ing in ingredients)
         {
-            RectTransform rt = slot.GetComponent<RectTransform>();
-            rt.anchoredPosition = new Vector2(0, yOffset);
-            yOffset += spacing;
+            UIIngredientSlot slot = Instantiate(slotPrefab);
+            slot.ingredientText.text = ing.ingredientName;
+
+            // ✔ Zarovnanie textu doľava
+            slot.ingredientText.alignment = TMPro.TextAlignmentOptions.Left;
+            // 🔹 Make text black
+            slot.ingredientText.color = Color.black;
+
+            slot.SetUnlocked(ing.unlocked);
+            ing.uiSlot = slot;
+
+            Transform parent = GetParentForPage(ing.pageIndex);
+            slot.transform.SetParent(parent, false);
+
+            if (!pageSlots.ContainsKey(ing.pageIndex))
+                pageSlots[ing.pageIndex] = new List<UIIngredientSlot>();
+            pageSlots[ing.pageIndex].Add(slot);
+        }
+
+        // Auto vertical spacing
+        foreach (var page in pageSlots)
+        {
+            float yOffset = -20f;
+            float spacing = -80f;
+
+            foreach (var slot in page.Value)
+            {
+                RectTransform rt = slot.GetComponent<RectTransform>();
+                rt.anchoredPosition = new Vector2(0, yOffset);
+                yOffset += spacing;
+            }
         }
     }
-}
-
 
     Transform GetParentForPage(int pageIndex)
     {
@@ -119,24 +123,36 @@ public class BookIngredientManager : MonoBehaviour
     }
 
     public void UnlockIngredient(string ingredientName)
-{
-    var ing = ingredients.Find(i => i.ingredientName == ingredientName);
-    if (ing != null)
     {
-        ing.unlocked = true;
+        var ing = ingredients.Find(i => i.ingredientName == ingredientName);
+        if (ing != null)
+        {
+            ing.unlocked = true;
 
-        if (ing.uiSlot != null)
-            ing.uiSlot.SetUnlocked(true);
+            if (ing.uiSlot != null)
+                ing.uiSlot.SetUnlocked(true);
 
-        Debug.Log($"Ingredient UNLOCKED → {ingredientName}");
+            Debug.Log($"Ingredient UNLOCKED → {ingredientName}");
 
-        // 🔥 okamžitá aktualizácia UI
-        UpdatePageVisibility();
+            // 🔥 okamžitá aktualizácia UI
+            UpdatePageVisibility();
+
+            // Check if all ingredients are unlocked
+            CheckWinCondition();
+        }
+        else
+        {
+            Debug.LogWarning($"Ingredient '{ingredientName}' not found!");
+        }
     }
-    else
+
+    void CheckWinCondition()
     {
-        Debug.LogWarning($"Ingredient '{ingredientName}' not found!");
+        bool allUnlocked = ingredients.TrueForAll(i => i.unlocked);
+        if (allUnlocked && winPanel != null)
+        {
+            winPanel.SetActive(true);
+            Debug.Log("All ingredients unlocked! You WIN!");
+        }
     }
-}
-
 }

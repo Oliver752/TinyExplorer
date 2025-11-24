@@ -140,13 +140,13 @@ public class TutorialManager : MonoBehaviour
     {
         if (tutorialPanel != null) tutorialPanel.SetActive(true);
         if (tutorialText != null)
-            tutorialText.text = "  ";
+            tutorialText.text = "Click to kill enemies";
     }
 
     void ShowInteractText()
     {
         if (tutorialPanel != null) tutorialPanel.SetActive(true);
         if (tutorialText != null)
-            tutorialText.text = "   ";
+            tutorialText.text = "Press i to open book";
     }
 }
