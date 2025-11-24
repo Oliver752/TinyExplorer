@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityTutorial.Manager;
+using UnityTutorial.Logging;
 
 namespace UnityTutorial.PlayerControl
 {
@@ -164,6 +165,7 @@ private void Move()
             if (!_inputManager.Jump) return;
             if (!_grounded) return;
             _animator.SetTrigger(_jumpHash);
+            GameLogger.Instance.Log("jump", transform.position);
         }
 
         public void JumpAddForce()

@@ -44509,6 +44509,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 714617113}
   m_Mesh: {fileID: 4300000, guid: 60694673404b80d45920d4cb862f845a, type: 3}
+--- !u!1 &715279266
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 715279267}
+  m_Layer: 0
+  m_Name: GameLogger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &715279267
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 715279266}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 302.34894, y: 0, z: -705.66345}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &716149536
 GameObject:
   m_ObjectHideFlags: 0
@@ -58313,8 +58344,8 @@ Light:
   m_Enabled: 1
   serializedVersion: 11
   m_Type: 1
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Color: {r: 1, g: 0.83101434, b: 0.504717, a: 1}
+  m_Intensity: 0.5
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -128472,6 +128503,10 @@ PrefabInstance:
       propertyPath: JumpFactor
       value: 13
       objectReference: {fileID: 0}
+    - target: {fileID: 113039757518145394, guid: ef13479f2a1ce504192ee70f6d92acce, type: 3}
+      propertyPath: MouseSensitivity
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 266243662315356583, guid: ef13479f2a1ce504192ee70f6d92acce, type: 3}
       propertyPath: m_Name
       value: PlayerModel
@@ -128663,3 +128698,4 @@ SceneRoots:
   - {fileID: 158069208}
   - {fileID: 168464956}
   - {fileID: 93241294}
+  - {fileID: 715279267}

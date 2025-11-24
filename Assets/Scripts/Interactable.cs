@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityTutorial.Logging;
 
 [RequireComponent(typeof(Outline))]
 public class Interactable : MonoBehaviour
@@ -54,6 +55,7 @@ public class Interactable : MonoBehaviour
 
         // Zavolá event (napr. animácia pickup)
         onInteraction.Invoke();
+        GameLogger.Instance.Log("collect", transform.position, ingredientNameToUnlock);
     }
 
     public void DisableOutline()

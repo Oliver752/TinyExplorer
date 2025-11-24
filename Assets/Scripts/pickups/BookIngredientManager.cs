@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityTutorial.Logging;
 
 public class BookIngredientManager : MonoBehaviour
 {
@@ -152,6 +153,7 @@ public class BookIngredientManager : MonoBehaviour
         if (allUnlocked && winPanel != null)
         {
             winPanel.SetActive(true);
+            GameLogger.Instance.Log("finishlevel", playerTransform.position);
             Debug.Log("All ingredients unlocked! You WIN!");
         }
     }

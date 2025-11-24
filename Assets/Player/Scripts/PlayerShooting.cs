@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityTutorial.Logging;
 
 public class PlayerShooting : MonoBehaviour
 {
@@ -24,6 +25,7 @@ public class PlayerShooting : MonoBehaviour
     void Shoot()
     {
         // Ray z kamery smerom dopredu (stred obrazovky)
+        GameLogger.Instance.Log("shoot", shootPoint.position);
         Ray ray = cam.ScreenPointToRay(new Vector2(
             Screen.width * 0.5f,
             Screen.height * 0.5f));
