@@ -4,19 +4,26 @@ using System.Collections.Generic;
 
 public class PlayerInteraction : MonoBehaviour
 {
-   public float playerReach = 3.0f;
-   public Camera playerCamera;
+    public float playerReach = 3.0f;
+    public Camera playerCamera;
 
-   Interactable currentInteractable;
+    Interactable currentInteractable;
 
-    // Update is called once per frame
     void Update()
     {
         CheckInteraction();
 
         if (Input.GetKeyDown(KeyCode.E) && currentInteractable != null)
         {
-            currentInteractable.Interact();
+            // Make sure the object still exists
+            if (currentInteractable.gameObject != null)
+            {
+                currentInteractable.Interact();
+            }
+            else
+            {
+                currentInteractable = null;
+            }
         }
     }
 
@@ -25,15 +32,15 @@ public class PlayerInteraction : MonoBehaviour
         RaycastHit hit;
         Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
 
-        //if colliders with anything within player reach
         if (Physics.Raycast(ray, out hit, playerReach))
         {
-            if (hit.collider.tag == "Interactable") //if looking at an interactable objects
+            if (hit.collider.CompareTag("Interactable")) 
             {
                 Interactable newInteractable = hit.collider.GetComponent<Interactable>();
 
-                //if there is a currentInteractable and it is not the newInteractable
-                if (currentInteractable && newInteractable != currentInteractable)
+                if (newInteractable == null) return;
+
+                if (currentInteractable != null && newInteractable != currentInteractable)
                 {
                     currentInteractable.DisableOutline();
                 }
@@ -42,12 +49,12 @@ public class PlayerInteraction : MonoBehaviour
                 {
                     SetNewCurrentInteractable(newInteractable);
                 }
-                else // if new interactable is not enabled
+                else
                 {
                     DisableCurrentInteractable();
                 }
             }
-            else //if not an interactable
+            else
             {
                 DisableCurrentInteractable();
             }
@@ -61,14 +68,21 @@ public class PlayerInteraction : MonoBehaviour
     void SetNewCurrentInteractable(Interactable newInteractable)
     {
         currentInteractable = newInteractable;
-        currentInteractable.EnableOutline();
-        HUDController.instance.EnableInteractionText(currentInteractable.message);
+
+        if (currentInteractable != null)
+        {
+            currentInteractable.EnableOutline();
+            if (HUDController.instance != null)
+                HUDController.instance.EnableInteractionText(currentInteractable.message);
+        }
     }
 
     void DisableCurrentInteractable()
     {
-        HUDController.instance.DisableInteractionText();
-        if (currentInteractable)
+        if (HUDController.instance != null)
+            HUDController.instance.DisableInteractionText();
+
+        if (currentInteractable != null)
         {
             currentInteractable.DisableOutline();
             currentInteractable = null;

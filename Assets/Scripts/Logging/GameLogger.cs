@@ -1,3 +1,4 @@
+/*
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -94,3 +95,4 @@ namespace UnityTutorial.Manager        // <-- ADD THIS LINE
         }
     }
 }
+*/

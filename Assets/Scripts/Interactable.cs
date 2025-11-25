@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
-using UnityTutorial.Logging;
+//using UnityTutorial.Logging;
+using UnityTutorial.PlayerControl;
 
 [RequireComponent(typeof(Outline))]
 public class Interactable : MonoBehaviour
@@ -32,31 +33,50 @@ public class Interactable : MonoBehaviour
     }
 
     public void Interact()
+{
+    Debug.Log($"INTERACT called on: {gameObject.name}");
+
+    // Display message if set
+    if (!string.IsNullOrEmpty(message))
+        Debug.Log("Message: " + message);
+
+    // Unlock ingredient if applicable
+    if (bookIngredientManager != null && !string.IsNullOrEmpty(ingredientNameToUnlock))
     {
-        Debug.Log($"INTERACT called on: {gameObject.name}");
-
-        // Zobraz spravu, ak je nastavená
-        if (!string.IsNullOrEmpty(message))
-            Debug.Log("Message: " + message);
-
-        // Odomknutie ingrediencie
-        if (bookIngredientManager != null && !string.IsNullOrEmpty(ingredientNameToUnlock))
-        {
-            bookIngredientManager.UnlockIngredient(ingredientNameToUnlock);
-            Debug.Log($"INTERACTION → Unlocking ingredient: {ingredientNameToUnlock}");
-        }
-        else if (string.IsNullOrEmpty(ingredientNameToUnlock))
-        {
-            Debug.LogWarning("ingredientNameToUnlock is empty!");
-        }
-
-        // Zapni Outline na krátku vizuálnu spätnú väzbu
-        EnableOutline();
-
-        // Zavolá event (napr. animácia pickup)
-        onInteraction.Invoke();
-        GameLogger.Instance.Log("collect", transform.position, ingredientNameToUnlock);
+        bookIngredientManager.UnlockIngredient(ingredientNameToUnlock);
+        Debug.Log($"INTERACTION → Unlocking ingredient: {ingredientNameToUnlock}");
     }
+    else if (string.IsNullOrEmpty(ingredientNameToUnlock))
+    {
+        Debug.LogWarning("ingredientNameToUnlock is empty!");
+    }
+
+    // Play pickup animation on the player
+    GameObject player = GameObject.FindGameObjectWithTag("Player");
+    if (player != null)
+    {
+        PlayerController pc = player.GetComponent<PlayerController>();
+        if (pc != null)
+        {
+            pc.GetComponentInChildren<Animator>()?.SetTrigger("Pickup");
+            Debug.Log("Pickup animation triggered on player!");
+        }
+        else
+        {
+            Debug.LogError("PlayerController not found on Player!");
+        }
+    }
+    else
+    {
+        Debug.LogError("Player object not found in scene!");
+    }
+
+    // Trigger any additional events (e.g., sound, effects)
+    onInteraction.Invoke();
+
+    // Enable outline briefly for visual feedback
+    EnableOutline();
+}
 
     public void DisableOutline()
     {

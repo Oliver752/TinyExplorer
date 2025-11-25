@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityTutorial.Logging;
+//using UnityTutorial.Logging;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -18,7 +18,7 @@ public class PlayerHealth : MonoBehaviour
         if (isDead) return;
 
         currentHealth -= amount;
-        GameLogger.Instance.Log("takedamage", transform.position, "", (int)amount);
+        //GameLogger.Instance.Log("takedamage", transform.position, "", (int)amount);
         Debug.Log($"Player took {amount} damage, remaining health: {currentHealth}");
 
         if (currentHealth <= 0)
@@ -30,7 +30,7 @@ public class PlayerHealth : MonoBehaviour
     private void Die()
     {
         if (isDead) return;
-        GameLogger.Instance.Log("lose", transform.position);
+        //GameLogger.Instance.Log("lose", transform.position);
         isDead = true;
 
         Debug.Log("Player died!");

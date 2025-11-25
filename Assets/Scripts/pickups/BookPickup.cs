@@ -85,20 +85,40 @@ public class BookPickup : MonoBehaviour
     void Pickup()
 {
     pickedUp = true;
+
     if (pressETipUI != null)
         pressETipUI.SetActive(false);
 
+    // 🔥 PLAY PICKUP ANIMATION HERE (uses children so it ALWAYS works)
+    if (player != null)
+    {
+        Animator anim = player.GetComponentInChildren<Animator>();
+        if (anim != null)
+        {
+            anim.SetTrigger("Pickup");
+            Debug.Log("Pickup animation triggered.");
+        }
+        else
+        {
+            Debug.LogError("NO Animator FOUND on player or its children!");
+        }
+    }
+
+    // Activate the book you carry
     if (book != null)
         book.SetActive(true);
     else
         Debug.LogError("BOOK object not assigned!");
 
-    // Tell the BookUIManager that the book has been picked up
+    // Notify UI Manager
     BookUIManager uiManager = FindObjectOfType<BookUIManager>();
     if (uiManager != null)
         uiManager.hasPickedUpBook = true;
 
-    Destroy(gameObject);
+    // Delay destruction so animation can trigger properly
+    Destroy(gameObject, 0.1f);
 }
+
+
 
 }

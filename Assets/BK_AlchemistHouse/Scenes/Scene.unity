@@ -128657,7 +128657,10 @@ MonoBehaviour:
   cam: {fileID: 2010381362}
   bulletPrefab: {fileID: 224617451086924992, guid: 28dfb34e793e0924e89d7455d24818ad, type: 3}
   shootPoint: {fileID: 2083139931}
-  fireRate: 0.2
+  playerAnimator: {fileID: 0}
+  fireCooldown: 2
+  fireballTriggerName: Fireball
+  fireballSpawnDelay: 1.2
 --- !u!114 &7596556814108037670
 MonoBehaviour:
   m_ObjectHideFlags: 0
