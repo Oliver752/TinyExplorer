@@ -20,6 +20,8 @@ public class IntroSequenceController : MonoBehaviour
     public AudioClip secondMusic;
     public float audioVolume = 0.6f;
 
+    public bool IntroFinished => introFinished;
+
     [Header("References")]
     public Camera introCamera;
     public SplinePath path;
