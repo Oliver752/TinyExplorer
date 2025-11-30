@@ -4,8 +4,7 @@ public class ShowAfterIntro : MonoBehaviour
 {
     public IntroSequenceController intro;
 
-    // If for some reason `intro` is null, we can fall back to a fixed delay.
-    public float fallbackDelay = 15f;   // seconds (set to your intro length if needed)
+    public float fallbackDelay = 15f;
 
     private CanvasGroup canvasGroup;
     private float timer = 0f;
@@ -13,7 +12,6 @@ public class ShowAfterIntro : MonoBehaviour
 
     void Awake()
     {
-        // Make sure we have a CanvasGroup – add one if missing
         canvasGroup = GetComponent<CanvasGroup>();
         if (canvasGroup == null)
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
@@ -21,7 +19,6 @@ public class ShowAfterIntro : MonoBehaviour
 
     void Start()
     {
-        // Hide UI at start (but keep GameObject active!)
         canvasGroup.alpha = 0f;
         canvasGroup.interactable = false;
         canvasGroup.blocksRaycasts = false;
@@ -33,7 +30,6 @@ public class ShowAfterIntro : MonoBehaviour
 
         bool shouldShow = false;
 
-        // Preferred: use the IntroFinished flag
         if (intro != null)
         {
             if (intro.IntroFinished)

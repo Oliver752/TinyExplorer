@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1081357464728",
+    "firebase_url": "https://vkvs-tinyexplorer-default-rtdb.firebaseio.com",
+    "project_id": "vkvs-tinyexplorer",
+    "storage_bucket": "vkvs-tinyexplorer.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1081357464728:android:cc4cc2569dd26a55ddcced",
+        "android_client_info": {
+          "package_name": "com.vkvs.tinyexplorer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbb5VU3WZnEhMrQGKmrdOIgywiXR6AwVo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
