@@ -129687,7 +129687,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
   maxHealth: 100
   damageFlash: {fileID: 1667599203}
-  crosshair: {fileID: 0}
+  crosshair: {fileID: 1236425233}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
