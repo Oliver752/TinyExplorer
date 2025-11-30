@@ -12,6 +12,16 @@ public class EnemyHealth : MonoBehaviour
 
     private bool isDead = false;
 
+    // 🔹 Exposed health percentage for the UI (0–1)
+    public float HealthPercent
+    {
+        get
+        {
+            if (maxHealth <= 0f) return 0f;
+            return currentHealth / maxHealth;
+        }
+    }
+
     private void Start()
     {
         currentHealth = maxHealth;
@@ -27,8 +37,9 @@ public class EnemyHealth : MonoBehaviour
         currentHealth -= amount;
         Debug.Log($"Spider took {amount} damage, remaining health: {currentHealth}");
 
-        if (currentHealth <= 0)
+        if (currentHealth <= 0f)
         {
+            currentHealth = 0f;  // clamp so it never goes below 0
             Die();
         }
     }
@@ -38,13 +49,16 @@ public class EnemyHealth : MonoBehaviour
         if (isDead) return;
         isDead = true;
 
+        // 🔹 Optional: hide the health bar immediately on death
+        EnemyHealthBar bar = GetComponentInChildren<EnemyHealthBar>();
+        if (bar != null)
+        {
+            bar.gameObject.SetActive(false);
+        }
+
         // stop AI
         if (agent != null) agent.isStopped = true;
         if (ai != null) ai.enabled = false;
-
-        // play Die animation
-        if (animator != null)
-            animator.SetTrigger("Die");
 
         // disable collider
         Collider col = GetComponent<Collider>();

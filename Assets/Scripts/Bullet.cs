@@ -7,25 +7,37 @@ public class Bullet : MonoBehaviour
     public float lifeTime = 2f;
 
     private Rigidbody rb;
+    private bool hasHit = false;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
+
+        // Correct property name is "velocity"
         rb.linearVelocity = transform.forward * speed;
         rb.useGravity = false;
 
         Destroy(gameObject, lifeTime);
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        EnemyHealth enemy = collision.collider.GetComponent<EnemyHealth>();
+        if (hasHit) return;
 
+        // OPTIONAL: ignore player hitbox if needed
+        if (other.CompareTag("Player")) return;
+
+        // Look for EnemyHealth on this object or its parents (covers multi-collider enemies)
+        EnemyHealth enemy = other.GetComponentInParent<EnemyHealth>();
         if (enemy != null)
         {
+            hasHit = true;
             enemy.TakeDamage(damage);
+
+            Destroy(gameObject);   // ❗ only destroy if we actually hit an enemy
         }
 
-        Destroy(gameObject);
+        // ❌ DO NOT destroy the bullet here for non-enemy hits
+        // so it can pass through ground / faulty hitboxes, and die only by lifeTime
     }
 }
