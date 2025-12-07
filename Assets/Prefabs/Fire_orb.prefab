@@ -14597,7 +14597,7 @@ MonoBehaviour:
   damage: 20
   lifeTime: 5
   explosionPrefab: {fileID: 7634243427553568338, guid: a63e6673345e7b2498f5bdbed769b70b, type: 3}
-  explosionRadius: 2
+  explosionRadius: 1
   explosionDamage: 20
   explosionForce: 15
   applyShockwave: 1

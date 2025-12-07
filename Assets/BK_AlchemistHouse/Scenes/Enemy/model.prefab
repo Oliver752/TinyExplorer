@@ -2654,6 +2654,8 @@ GameObject:
   - component: {fileID: 4882714114140823924}
   - component: {fileID: 7117719313188622541}
   - component: {fileID: 6703974644823534207}
+  - component: {fileID: 2510190967289281842}
+  - component: {fileID: 1522650586756703529}
   m_Layer: 0
   m_Name: model
   m_TagString: Untagged
@@ -2714,15 +2716,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpiderAI
   player: {fileID: 0}
-  walkDistance: 12
-  runDistance: 6
-  attackDistance: 1.7
+  walkDistance: 1.2
+  runDistance: 0.6
+  attackDistance: 0.2
   walkSpeed: 0.3
   runSpeed: 0.6
-  wanderRadius: 8
-  wanderInterval: 3
+  wanderRadius: 0.8
+  wanderInterval: 2
   attackDamage: 20
-  attackCooldown: 1.2
+  attackCooldown: 2
 --- !u!195 &6703974644823534207
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -2732,19 +2734,53 @@ NavMeshAgent:
   m_GameObject: {fileID: 5499941820462069060}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
-  m_Speed: 6
-  m_Acceleration: 8
+  m_Radius: 0.03
+  m_Speed: 0.2
+  m_Acceleration: 12
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0
+  m_StoppingDistance: 0.15
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
-  m_Height: 0.5
+  m_Height: 0.15
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!65 &2510190967289281842
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5499941820462069060}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1522650586756703529
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5499941820462069060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26d2a3f9c163c2445a0acf1c51842a90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
+  maxHealth: 60
 --- !u!1 &5526637694281212688
 GameObject:
   m_ObjectHideFlags: 0
