@@ -129724,7 +129724,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerShooting
   cam: {fileID: 2010381362}
-  bulletPrefab: {fileID: 224617451086924992, guid: 28dfb34e793e0924e89d7455d24818ad, type: 3}
+  bulletPrefab: {fileID: 7651522388263246089, guid: fefab0dcc151de84a8ae95c4bb61147a, type: 3}
   shootPoint: {fileID: 2083139931}
   playerAnimator: {fileID: 0}
   fireCooldown: 2
