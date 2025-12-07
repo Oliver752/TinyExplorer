@@ -44982,7 +44982,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 728690958}
-  - component: {fileID: 728690957}
+  - component: {fileID: 728690959}
   m_Layer: 0
   m_Name: FirebaseAnalytics
   m_TagString: Untagged
@@ -44990,18 +44990,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &728690957
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 728690956}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6c22d220262e57649a3a011b1933751f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FirebaseGameAnalytics
 --- !u!4 &728690958
 Transform:
   m_ObjectHideFlags: 0
@@ -45017,6 +45005,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &728690959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 728690956}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2306afd1e4365914d83809eeed9fd66b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameSessionStarter
 --- !u!1001 &730937442
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -118742,6 +118742,7 @@ MonoBehaviour:
   pressETipUI: {fileID: 1006876634}
   book: {fileID: 1961928453}
   infoText: {fileID: 0}
+  itemId: book
 --- !u!114 &1961928459
 MonoBehaviour:
   m_ObjectHideFlags: 0

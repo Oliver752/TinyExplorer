@@ -37,6 +37,17 @@ public class EnemyHealth : MonoBehaviour
         currentHealth -= amount;
         Debug.Log($"Spider took {amount} damage, remaining health: {currentHealth}");
 
+        if (FirebaseGameAnalytics.Instance != null && FirebaseGameAnalytics.Instance.IsReady)
+        {
+            FirebaseGameAnalytics.Instance.LogGameplayEvent(
+                "hitenemy",
+                transform.position,
+                gameObject.name,
+                Mathf.RoundToInt(amount)
+            );
+        }
+
+
         if (currentHealth <= 0f)
         {
             currentHealth = 0f;  // clamp so it never goes below 0

@@ -34,6 +34,14 @@ public class GameOverManager : MonoBehaviour
 
     public void ShowGameOver()
     {
+        // End session
+        if (FirebaseGameAnalytics.Instance != null && FirebaseGameAnalytics.Instance.IsReady)
+        {
+            FirebaseGameAnalytics.Instance.LogGameplayEvent("lose");
+            FirebaseGameAnalytics.Instance.EndSession(true); 
+            Debug.Log("[GameOverManager] Firebase session ended (gameOver=true).");
+        }
+
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
@@ -70,6 +78,13 @@ public class GameOverManager : MonoBehaviour
 
     public void RestartGame()
     {
+        // new run = new session
+        if (FirebaseGameAnalytics.Instance != null && FirebaseGameAnalytics.Instance.IsReady)
+        {
+            FirebaseGameAnalytics.Instance.StartSession();
+            Debug.Log("[GameOverManager] Firebase session started from RestartGame().");
+        }
+
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

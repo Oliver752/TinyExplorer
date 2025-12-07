@@ -87,5 +87,17 @@ public class PlayerShooting : MonoBehaviour
         Quaternion rot = Quaternion.LookRotation(dir, Vector3.up);
 
         Instantiate(bulletPrefab, shootPoint.position, rot);
+
+        // Log shooting 
+        if (FirebaseGameAnalytics.Instance != null && FirebaseGameAnalytics.Instance.IsReady)
+        {
+            FirebaseGameAnalytics.Instance.LogGameplayEvent(
+                "shoot",
+                transform.position,
+                hit.transform != null ? hit.transform.name : "None",
+                0
+            );
+
+        }
     }
 }

@@ -9,6 +9,8 @@ public class BookPickup : MonoBehaviour
     public GameObject book;
     public Text infoText; // Optional UI text to show messages
 
+    [SerializeField] private string itemId = "book";   // 🔹 ezt tettük hozzá
+
     private Transform player;
     private bool pickedUp = false;
 
@@ -83,42 +85,56 @@ public class BookPickup : MonoBehaviour
     }
 
     void Pickup()
-{
-    pickedUp = true;
-
-    if (pressETipUI != null)
-        pressETipUI.SetActive(false);
-
-    // 🔥 PLAY PICKUP ANIMATION HERE (uses children so it ALWAYS works)
-    if (player != null)
     {
-        Animator anim = player.GetComponentInChildren<Animator>();
-        if (anim != null)
+        pickedUp = true;
+
+        if (pressETipUI != null)
+            pressETipUI.SetActive(false);
+
+        // 🔥 pickup anim
+        if (player != null)
         {
-            anim.SetTrigger("Pickup");
-            Debug.Log("Pickup animation triggered.");
+            Animator anim = player.GetComponentInChildren<Animator>();
+            if (anim != null)
+            {
+                anim.SetTrigger("Pickup");
+                Debug.Log("Pickup animation triggered.");
+            }
+            else
+            {
+                Debug.LogError("NO Animator FOUND on player or its children!");
+            }
+        }
+
+        // Firebase log
+        if (FirebaseGameAnalytics.Instance != null && FirebaseGameAnalytics.Instance.IsReady)
+        {
+            FirebaseGameAnalytics.Instance.LogItemPickup(itemId);
+            FirebaseGameAnalytics.Instance.LogGameplayEvent(
+                "collect",
+                transform.position,
+                itemId    
+            );
+
+            Debug.Log("[BookPickup] Logged item pickup + collect: " + itemId);
         }
         else
         {
-            Debug.LogError("NO Animator FOUND on player or its children!");
+            Debug.LogWarning("[BookPickup] FirebaseGameAnalytics not ready, item not logged.");
         }
+
+        // Activate the book you carry
+        if (book != null)
+            book.SetActive(true);
+        else
+            Debug.LogError("BOOK object not assigned!");
+
+        // Notify UI Manager
+        BookUIManager uiManager = FindObjectOfType<BookUIManager>();
+        if (uiManager != null)
+            uiManager.hasPickedUpBook = true;
+
+        // Delay destruction so animation can trigger properly
+        Destroy(gameObject, 0.1f);
     }
-
-    // Activate the book you carry
-    if (book != null)
-        book.SetActive(true);
-    else
-        Debug.LogError("BOOK object not assigned!");
-
-    // Notify UI Manager
-    BookUIManager uiManager = FindObjectOfType<BookUIManager>();
-    if (uiManager != null)
-        uiManager.hasPickedUpBook = true;
-
-    // Delay destruction so animation can trigger properly
-    Destroy(gameObject, 0.1f);
-}
-
-
-
 }

@@ -165,7 +165,12 @@ private void Move()
             if (!_inputManager.Jump) return;
             if (!_grounded) return;
             _animator.SetTrigger(_jumpHash);
-            //GameLogger.Instance.Log("jump", transform.position);
+           
+           // Firebase log
+            if (FirebaseGameAnalytics.Instance != null && FirebaseGameAnalytics.Instance.IsReady)
+            {
+                FirebaseGameAnalytics.Instance.LogGameplayEvent("jump", transform.position);
+            }
         }
 
         public void JumpAddForce()

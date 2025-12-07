@@ -133,6 +133,38 @@ public class FirebaseGameAnalytics : MonoBehaviour
         Debug.Log($"[FirebaseGameAnalytics] Logged item pickup: {itemId}");
     }
 
+
+    public void LogGameplayEvent(string eventName, Vector3 pos, string target = "", int value = 0)
+    {
+        if (_currentSession == null)
+        {
+            Debug.LogWarning($"[FirebaseGameAnalytics] No active session – cannot log event {eventName}.");
+            return;
+        }
+
+        var ev = new LogEvent
+        {
+            userId    = _currentSession.userId,
+            sessionId = _currentSession.sessionId,
+            eventName = eventName,
+            gameTime  = Time.timeSinceLevelLoad,
+            posX      = pos.x,
+            posY      = pos.y,
+            posZ      = pos.z,
+            target    = target,
+            value     = value
+        };
+
+        _currentSession.events.Add(ev);
+        Debug.Log($"[FirebaseGameAnalytics] Logged event: {eventName} ({target}, value={value})");
+    }
+
+    public void LogGameplayEvent(string eventName, string target = "", int value = 0)
+    {
+        LogGameplayEvent(eventName, Vector3.zero, target, value);
+    }
+
+
     /// <summary>
     /// Ends the current session and writes it to the Realtime Database.
     /// gameOver=true means this was a death / game over.

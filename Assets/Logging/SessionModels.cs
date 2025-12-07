@@ -22,5 +22,7 @@ public class SessionData
 
     public List<ItemPickupEvent> itemsPicked = new List<ItemPickupEvent>();
 
+    public List<LogEvent> events = new List<LogEvent>();
+
     public string buildVersion;
 }

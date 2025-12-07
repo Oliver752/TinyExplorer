@@ -67,6 +67,17 @@ public class MenuManager : MonoBehaviour
     {
         PlayClickSound();
 
+        // Firebase session start
+        if (FirebaseGameAnalytics.Instance != null && FirebaseGameAnalytics.Instance.IsReady)
+        {
+            FirebaseGameAnalytics.Instance.StartSession();
+            Debug.Log("[MenuManager] Firebase session started from menu.");
+        }
+        else
+        {
+            Debug.LogWarning("[MenuManager] FirebaseGameAnalytics not ready when starting game.");
+        }
+
         if (PlayerPrefs.HasKey(SAVE_KEY))
         {
             string sceneToLoad = PlayerPrefs.GetString(SAVE_KEY);

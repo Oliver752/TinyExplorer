@@ -21,6 +21,18 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
+
+        if (FirebaseGameAnalytics.Instance != null && FirebaseGameAnalytics.Instance.IsReady)
+        {
+            FirebaseGameAnalytics.Instance.LogGameplayEvent(
+                "takedamage",
+                transform.position,
+                gameObject.name,
+                Mathf.RoundToInt(amount)
+            );
+        }
+
+
         if (isDead) return;
 
         currentHealth -= amount;
