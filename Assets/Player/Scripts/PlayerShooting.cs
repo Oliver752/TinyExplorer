@@ -17,14 +17,27 @@ public class PlayerShooting : MonoBehaviour
     public string fireballTriggerName = "Fireball"; // Animator trigger
     public float fireballSpawnDelay = 1.2f;         // Delay before fireball spawns (seconds)
 
+    [Header("Audio")]
+    public AudioSource audioSource;      // Existing AudioSource on the player
+    public AudioClip shootSound;         // Fireball casting sound
+    public float shootVolume = 1f;
+
     void Start()
     {
+        // Ensure animator exists
         if (playerAnimator == null)
         {
             playerAnimator = GetComponentInChildren<Animator>();
             if (playerAnimator == null)
                 Debug.LogWarning("Player Animator not found on this GameObject or its children!");
         }
+
+        // Auto-grab existing AudioSource on player
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();
+
+        if (audioSource == null)
+            Debug.LogWarning("No AudioSource found on the Player!");
     }
 
     void Update()
@@ -39,17 +52,21 @@ public class PlayerShooting : MonoBehaviour
     {
         canShoot = false;
 
+        // 🔊 Play sound IMMEDIATELY when the attack begins
+        if (audioSource != null && shootSound != null)
+            audioSource.PlayOneShot(shootSound, shootVolume);
+
         // Trigger the fireball animation
         if (playerAnimator != null)
             playerAnimator.SetTrigger(fireballTriggerName);
 
-        // Wait for the animation to reach the fireball spawn point
+        // Wait for the animation to reach the spawn frame
         yield return new WaitForSeconds(fireballSpawnDelay);
 
-        // Spawn the fireball
+        // Spawn fireball
         Shoot();
 
-        // Wait for the remaining cooldown
+        // Wait for remaining cooldown
         yield return new WaitForSeconds(fireCooldown - fireballSpawnDelay);
 
         canShoot = true;
