@@ -23,15 +23,13 @@ public class MenuManager : MonoBehaviour
     [Header("Continue Button")]
     [SerializeField] private Button continueButton;
 
-    const string SAVE_KEY = "SavedScene";
-
     void Start()
     {
         mainMenuPanel.SetActive(true);
         settingsPanel.SetActive(false);
-        
+
         if (continueButton != null)
-            continueButton.gameObject.SetActive(PlayerPrefs.HasKey(SAVE_KEY));
+            continueButton.gameObject.SetActive(SaveSystem.HasSave());
 
         float savedMusicVolume = PlayerPrefs.GetFloat("MusicVolume", 0.6f);
         float savedSFXVolume = PlayerPrefs.GetFloat("SFXVolume", 0.8f);
@@ -59,7 +57,10 @@ public class MenuManager : MonoBehaviour
     public void StartGame()
     {
         PlayClickSound();
-        PlayerPrefs.SetString(SAVE_KEY, "Scene"); // uloží scénu
+
+        // New game => clear old save
+        SaveSystem.ClearSave();
+
         SceneManager.LoadScene("Scene");
     }
 
@@ -78,11 +79,17 @@ public class MenuManager : MonoBehaviour
             Debug.LogWarning("[MenuManager] FirebaseGameAnalytics not ready when starting game.");
         }
 
-        if (PlayerPrefs.HasKey(SAVE_KEY))
-        {
-            string sceneToLoad = PlayerPrefs.GetString(SAVE_KEY);
-            SceneManager.LoadScene(sceneToLoad);
-        }
+        if (!SaveSystem.HasSave())
+            return;
+
+        string sceneToLoad = SaveSystem.GetSavedScene();
+        if (string.IsNullOrEmpty(sceneToLoad))
+            sceneToLoad = "Scene";
+
+        // ✅ Make intro controller skip the intro ONCE and spawn at saved position
+        SaveSystem.RequestSkipIntroOnce();
+
+        SceneManager.LoadScene(sceneToLoad);
     }
 
     public void QuitGame()

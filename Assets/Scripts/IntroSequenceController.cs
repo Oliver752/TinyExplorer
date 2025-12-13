@@ -15,7 +15,7 @@ public class DialogueEntry
 public class IntroSequenceController : MonoBehaviour
 {
     [Header("Intro Audio")]
-    public AudioSource introAudioSource;   
+    public AudioSource introAudioSource;
     public AudioClip introMusic;
     public AudioClip secondMusic;
     public float audioVolume = 0.6f;
@@ -25,7 +25,7 @@ public class IntroSequenceController : MonoBehaviour
     [Header("References")]
     public Camera introCamera;
     public SplinePath path;
-    public GameObject player;
+    public GameObject player;              // may be prefab ref OR scene instance
     public Transform spawnPoint;
     public Camera gameplayCamera;
     public TutorialManager tutorialManager;
@@ -56,6 +56,68 @@ public class IntroSequenceController : MonoBehaviour
 
     void Start()
     {
+        // ✅ CONTINUE SUPPORT: skip intro and restore position/rotation properly
+        if (SaveSystem.ConsumeSkipIntroOnce() && SaveSystem.HasSave())
+        {
+            // Find runtime player instance (prefer field, fallback to tag)
+            GameObject playerObj = player != null ? player : GameObject.FindGameObjectWithTag("Player");
+
+            // Disable intro visuals
+            if (introCamera) introCamera.gameObject.SetActive(false);
+            if (dialogueCanvasGroup) dialogueCanvasGroup.alpha = 0f;
+            if (fullScreenFadeCanvasGroup) fullScreenFadeCanvasGroup.alpha = 0f;
+            if (postProcessVolume) postProcessVolume.enabled = false;
+
+            // Enable gameplay camera
+            if (gameplayCamera)
+            {
+                cachedFreeCam = gameplayCamera.GetComponent<FreeCamera>();
+                gameplayCamera.gameObject.SetActive(true);
+                gameplayCamera.enabled = true;
+                if (cachedFreeCam) cachedFreeCam.enabled = true;
+            }
+
+            // Place player at saved transform (Rigidbody-safe)
+            if (playerObj != null)
+            {
+                playerObj.SetActive(true);
+
+                Vector3 savedPos = SaveSystem.GetSavedPosition();
+                Quaternion savedRot = SaveSystem.GetSavedRotation();
+
+                Rigidbody rb = playerObj.GetComponent<Rigidbody>();
+                if (rb != null)
+                {
+                    rb.linearVelocity = Vector3.zero;
+                    rb.angularVelocity = Vector3.zero;
+                    rb.position = savedPos;
+                    rb.rotation = savedRot;
+                }
+                else
+                {
+                    playerObj.transform.position = savedPos;
+                    playerObj.transform.rotation = savedRot;
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[IntroSequenceController] Continue requested but Player not found in scene.");
+            }
+
+            introFinished = true;
+
+            if (tutorialManager != null)
+                tutorialManager.StartTutorial();
+
+            if (GameMusicManager.instance != null)
+                GameMusicManager.instance.PlayMusic();
+
+            Debug.Log("[IntroSequenceController] Skipped intro and restored player position (Continue).");
+            return;
+        }
+
+        // ------------------- normal intro flow -------------------
+
         if (introCamera)
         {
             introCamera.gameObject.SetActive(true);
