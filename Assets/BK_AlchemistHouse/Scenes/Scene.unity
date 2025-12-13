@@ -20660,6 +20660,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Zombie
       objectReference: {fileID: 0}
+    - target: {fileID: 5645799151863717880, guid: f565f74d9618b5741827221fae4bf79f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -49893,6 +49897,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Zombie (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 5645799151863717880, guid: f565f74d9618b5741827221fae4bf79f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -59511,7 +59519,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Outline
   outlineMode: 0
   outlineColor: {r: 0, g: 1, b: 0.17953038, a: 1}
-  outlineWidth: 10
+  outlineWidth: 2.53
   precomputeOutline: 1
   bakeKeys:
   - {fileID: 4300002, guid: 839cec4036df11b4b86742dbae0c0f9e, type: 3}
@@ -60020,6 +60028,21 @@ MonoBehaviour:
     - {x: 0, y: 0, z: 0}
     - {x: 0, y: 0, z: 0}
     - {x: 0, y: 0, z: 0}
+--- !u!114 &1008429781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 328088769}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89c6e9da6e041514591bd968f94f4074, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GlowPulse
+  speed: 3
+  minIntensity: 0
+  maxIntensity: 5
 --- !u!1001 &1008998267
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -66939,6 +66962,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1603537348931646, guid: 99d1fecb38c7bef41b71767f41b46db1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1535593853}
+    - targetCorrespondingSourceObject: {fileID: 1603537348931646, guid: 99d1fecb38c7bef41b71767f41b46db1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1535593859}
   m_SourcePrefab: {fileID: 100100000, guid: 99d1fecb38c7bef41b71767f41b46db1, type: 3}
 --- !u!1 &1133449842
 GameObject:
@@ -71778,6 +71804,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1112552271848226, guid: 15335e2ad9ea18540983fcec49298ce9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1448054581}
+    - targetCorrespondingSourceObject: {fileID: 1112552271848226, guid: 15335e2ad9ea18540983fcec49298ce9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1448054587}
   m_SourcePrefab: {fileID: 100100000, guid: 15335e2ad9ea18540983fcec49298ce9, type: 3}
 --- !u!1 &1209938967
 GameObject:
@@ -77985,7 +78014,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Outline
   outlineMode: 0
   outlineColor: {r: 0, g: 1, b: 0.23313022, a: 1}
-  outlineWidth: 10
+  outlineWidth: 2.53
   precomputeOutline: 1
   bakeKeys:
   - {fileID: 4300000, guid: 742e6e06b4d2da045bcb0a8064c3ca27, type: 3}
@@ -78554,6 +78583,21 @@ MonoBehaviour:
     - {x: -0.20899187, y: 0.25619003, z: 0.9437633}
     - {x: -0.1305025, y: 0.20830399, z: 0.96931857}
     - {x: -0.1072971, y: 0.25909296, z: 0.95987403}
+--- !u!114 &1324403438
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1324403427}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89c6e9da6e041514591bd968f94f4074, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GlowPulse
+  speed: 3
+  minIntensity: 0
+  maxIntensity: 5
 --- !u!1001 &1325500346
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -84354,7 +84398,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Outline
   outlineMode: 0
   outlineColor: {r: 0, g: 1, b: 0.2262168, a: 1}
-  outlineWidth: 10
+  outlineWidth: 2.53
   precomputeOutline: 1
   bakeKeys:
   - {fileID: 4300000, guid: 742e6e06b4d2da045bcb0a8064c3ca27, type: 3}
@@ -84923,6 +84967,21 @@ MonoBehaviour:
     - {x: -0.20899187, y: 0.25619003, z: 0.9437633}
     - {x: -0.1305025, y: 0.20830399, z: 0.96931857}
     - {x: -0.1072971, y: 0.25909296, z: 0.95987403}
+--- !u!114 &1448054587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1131494422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89c6e9da6e041514591bd968f94f4074, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GlowPulse
+  speed: 3
+  minIntensity: 0
+  maxIntensity: 5
 --- !u!1 &1449449328
 GameObject:
   m_ObjectHideFlags: 0
@@ -90392,7 +90451,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Outline
   outlineMode: 0
   outlineColor: {r: 0, g: 1, b: 0.14819956, a: 1}
-  outlineWidth: 10
+  outlineWidth: 2.53
   precomputeOutline: 1
   bakeKeys:
   - {fileID: 4300000, guid: a2735b1dfac180142a6846095da0a63e, type: 3}
@@ -90572,6 +90631,21 @@ MonoBehaviour:
     - {x: 0.7393925, y: 0, z: 0.6732746}
     - {x: 0.22850701, y: -0.7031956, z: 0.673276}
     - {x: 0.59819084, y: -0.43458882, z: 0.6732758}
+--- !u!114 &1535593859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1535593848}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89c6e9da6e041514591bd968f94f4074, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GlowPulse
+  speed: 3
+  minIntensity: 0
+  maxIntensity: 5
 --- !u!1 &1535888290
 GameObject:
   m_ObjectHideFlags: 0
@@ -96619,6 +96693,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1387962594864354, guid: a408d58eb3a85554ba6a86b3f5552740, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1008429775}
+    - targetCorrespondingSourceObject: {fileID: 1387962594864354, guid: a408d58eb3a85554ba6a86b3f5552740, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1008429781}
   m_SourcePrefab: {fileID: 100100000, guid: a408d58eb3a85554ba6a86b3f5552740, type: 3}
 --- !u!1001 &1632869105
 PrefabInstance:
@@ -104620,6 +104697,10 @@ PrefabInstance:
     - target: {fileID: 5645799151863717880, guid: f565f74d9618b5741827221fae4bf79f, type: 3}
       propertyPath: m_Name
       value: Zombie (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5645799151863717880, guid: f565f74d9618b5741827221fae4bf79f, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8614187797971905167, guid: f565f74d9618b5741827221fae4bf79f, type: 3}
       propertyPath: attackDamage
@@ -124469,6 +124550,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1090677295851248, guid: 7595edcf12c65a444b56f300f9f3e18b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1324403432}
+    - targetCorrespondingSourceObject: {fileID: 1090677295851248, guid: 7595edcf12c65a444b56f300f9f3e18b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1324403438}
   m_SourcePrefab: {fileID: 100100000, guid: 7595edcf12c65a444b56f300f9f3e18b, type: 3}
 --- !u!1 &2061298893
 GameObject:
@@ -126922,6 +127006,10 @@ PrefabInstance:
     - target: {fileID: 5645799151863717880, guid: f565f74d9618b5741827221fae4bf79f, type: 3}
       propertyPath: m_Name
       value: Zombie (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5645799151863717880, guid: f565f74d9618b5741827221fae4bf79f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

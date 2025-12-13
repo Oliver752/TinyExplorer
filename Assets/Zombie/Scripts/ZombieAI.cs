@@ -11,6 +11,7 @@ public class ZombieAI : MonoBehaviour
     [Header("Attack")]
     [SerializeField] private float timeBetweenAttacks = 1.2f;
     [SerializeField] private float attackLockTime = 1.0f;
+    [SerializeField] private float attackDamage = 20f;   // ✅ NEW: how much damage zombie deals per attack
 
     [Header("Audio")]
     [SerializeField] private AudioClip walkLoopSound;
@@ -18,6 +19,8 @@ public class ZombieAI : MonoBehaviour
 
     private NavMeshAgent agent;
     private Transform player;
+    private PlayerHealth playerHealth;                   // ✅ NEW: cached reference to PlayerHealth
+
     private Animator animator;
     private AudioSource audioSource;
 
@@ -40,7 +43,10 @@ public class ZombieAI : MonoBehaviour
 
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
+        {
             player = playerObj.transform;
+            playerHealth = playerObj.GetComponent<PlayerHealth>(); // ✅ NEW
+        }
 
         speedHash         = Animator.StringToHash("Speed");
         isAttackingHash   = Animator.StringToHash("IsAttacking");
@@ -49,8 +55,8 @@ public class ZombieAI : MonoBehaviour
         if (audioSource != null)
         {
             audioSource.playOnAwake = false;
-            audioSource.spatialBlend = 1f; 
-            audioSource.volume = 1f;       
+            audioSource.spatialBlend = 1f;
+            audioSource.volume = 1f;
         }
     }
 
@@ -65,7 +71,6 @@ public class ZombieAI : MonoBehaviour
             agent.ResetPath();
             animator.SetFloat(speedHash, 0f);
             FacePlayer();
-
 
             if (Time.time >= attackStateEndTime)
             {
@@ -124,6 +129,7 @@ public class ZombieAI : MonoBehaviour
 
     private void TryStartAttack()
     {
+        // ✅ Cooldown: prevents rapid damage (same role as spider's attackCooldown)
         if (Time.time < lastAttackTime + timeBetweenAttacks)
         {
             agent.isStopped      = true;
@@ -149,9 +155,16 @@ public class ZombieAI : MonoBehaviour
         animator.SetTrigger(attackTriggerHash);
 
         StopWalkSound();
-        PlayAttackSound();   
+        PlayAttackSound();
 
         FacePlayer();
+
+        // ✅ NEW: apply damage once per attack start
+        float distance = Vector3.Distance(transform.position, player.position);
+        if (distance <= attackRange + attackLeeway && playerHealth != null)
+        {
+            playerHealth.TakeDamage(attackDamage);
+        }
     }
 
     private void FacePlayer()

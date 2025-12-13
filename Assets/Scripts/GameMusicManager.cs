@@ -35,13 +35,26 @@ public class GameMusicManager : MonoBehaviour
         if (musicSource == null) return;
 
         if (clip != null) musicSource.clip = clip;
-        if (!musicSource.isPlaying) musicSource.Play();
+
         musicSource.loop = loop;
+
+        // Only play if not already playing
+        if (!musicSource.isPlaying)
+            musicSource.Play();
     }
 
     public void StopMusic()
     {
         if (musicSource != null && musicSource.isPlaying)
             musicSource.Stop();
+    }
+
+    // ✅ NEW: guarantees it will NOT keep playing into the restarted intro
+    public void StopAndRewind()
+    {
+        if (musicSource == null) return;
+
+        musicSource.Stop();
+        musicSource.time = 0f;
     }
 }

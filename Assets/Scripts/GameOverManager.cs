@@ -38,7 +38,7 @@ public class GameOverManager : MonoBehaviour
         if (FirebaseGameAnalytics.Instance != null && FirebaseGameAnalytics.Instance.IsReady)
         {
             FirebaseGameAnalytics.Instance.LogGameplayEvent("lose");
-            FirebaseGameAnalytics.Instance.EndSession(true); 
+            FirebaseGameAnalytics.Instance.EndSession(true);
             Debug.Log("[GameOverManager] Firebase session ended (gameOver=true).");
         }
 
@@ -68,16 +68,19 @@ public class GameOverManager : MonoBehaviour
 
     private void EnableUIControl()
     {
-        // Cursor for clicking button
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
-
-        // Allow EventSystem to receive navigation/clicks
         EventSystem.current.sendNavigationEvents = true;
     }
 
     public void RestartGame()
     {
+        // ✅ Stop gameplay music before reloading, so it doesn't overlap intro / restart
+        if (GameMusicManager.instance != null)
+        {
+            GameMusicManager.instance.StopAndRewind();
+        }
+
         // new run = new session
         if (FirebaseGameAnalytics.Instance != null && FirebaseGameAnalytics.Instance.IsReady)
         {

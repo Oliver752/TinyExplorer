@@ -58,10 +58,6 @@ public class PauseMenuController : MonoBehaviour
         // Freeze gameplay, but NOT audio
         Time.timeScale = pause ? 0f : 1f;
 
-        // 🔇 REMOVED: this was muting music & clicks
-        // if (pauseAudioListener)
-        //     AudioListener.pause = pause;
-
         Cursor.visible = pause;
         Cursor.lockState = pause ? CursorLockMode.None : CursorLockMode.Locked;
 
@@ -105,6 +101,12 @@ public class PauseMenuController : MonoBehaviour
 
         if (menuRoot != null)
             menuRoot.SetActive(false);
+
+        // ✅ IMPORTANT: stop gameplay music so it can't overlap menu music
+        if (GameMusicManager.instance != null)
+        {
+            GameMusicManager.instance.StopAndRewind();
+        }
 
         SceneManager.LoadScene("MainMenu");
     }
