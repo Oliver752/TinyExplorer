@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1093978825618",
+    "firebase_url": "https://unity-tinyexplorer-logs-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "unity-tinyexplorer-logs",
+    "storage_bucket": "unity-tinyexplorer-logs.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1093978825618:android:e33e4f2bef6f702c3b574b",
+        "android_client_info": {
+          "package_name": "com.vkvs.tinyexplorer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgOAeQxDb6fI5knmwfsesbnzD68KSTRMs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
