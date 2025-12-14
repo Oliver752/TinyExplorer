@@ -84,12 +84,19 @@ public class PauseMenuController : MonoBehaviour
     // RETURN TO MAIN MENU
     public void ReturnToMainMenu()
     {
-        // ✅ Save full state (scene + player transform)
+        // ✅ Save full state (scene + player transform + health)
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
-        {
-            SaveSystem.SaveFromPlayer(playerObj.transform);
-        }
+{
+    SaveSystem.SaveFromPlayer(playerObj.transform);
+
+    PlayerHealth ph = playerObj.GetComponent<PlayerHealth>();
+    if (ph != null)
+        SaveSystem.SavePlayerHealth(ph.GetCurrentHealth());
+
+    SaveSystem.SaveAllEnemiesInScene(); // ✅ add this
+}
+
         else
         {
             // fallback: at least save scene name so Continue can load something
@@ -110,7 +117,6 @@ public class PauseMenuController : MonoBehaviour
         if (menuRoot != null)
             menuRoot.SetActive(false);
 
-        // stop gameplay music so it can't overlap menu music
         if (GameMusicManager.instance != null)
             GameMusicManager.instance.StopAndRewind();
 

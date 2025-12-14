@@ -3,7 +3,7 @@ using UnityEngine.AI;
 
 public class EnemyHealth : MonoBehaviour
 {
-    public float maxHealth = 60f;  // Spider HP
+    public float maxHealth = 60f;
     private float currentHealth;
 
     private Animator animator;
@@ -12,7 +12,8 @@ public class EnemyHealth : MonoBehaviour
 
     private bool isDead = false;
 
-    // 🔹 Exposed health percentage for the UI (0–1)
+    public bool IsDead => isDead;
+
     public float HealthPercent
     {
         get
@@ -30,12 +31,24 @@ public class EnemyHealth : MonoBehaviour
         ai = GetComponent<SpiderAI>();
     }
 
+    public float GetCurrentHealth() => currentHealth;
+
+    public void SetHealthSilently(float value)
+    {
+        currentHealth = Mathf.Clamp(value, 0f, maxHealth);
+        if (currentHealth <= 0f)
+        {
+            currentHealth = 0f;
+            isDead = true;
+        }
+    }
+
     public void TakeDamage(float amount)
     {
         if (isDead) return;
 
         currentHealth -= amount;
-        Debug.Log($"Spider took {amount} damage, remaining health: {currentHealth}");
+        Debug.Log($"{name} took {amount} damage, remaining health: {currentHealth}");
 
         if (FirebaseGameAnalytics.Instance != null && FirebaseGameAnalytics.Instance.IsReady)
         {
@@ -47,10 +60,9 @@ public class EnemyHealth : MonoBehaviour
             );
         }
 
-
         if (currentHealth <= 0f)
         {
-            currentHealth = 0f;  // clamp so it never goes below 0
+            currentHealth = 0f;
             Die();
         }
     }
@@ -60,22 +72,26 @@ public class EnemyHealth : MonoBehaviour
         if (isDead) return;
         isDead = true;
 
-        // 🔹 Optional: hide the health bar immediately on death
+        // ✅ persist dead state immediately
+        var saveId = GetComponent<EnemySaveID>();
+        if (saveId != null && !string.IsNullOrEmpty(saveId.id))
+        {
+            SaveSystem.SaveEnemy(saveId.id, transform.position, transform.rotation, 0f, false);
+            PlayerPrefs.Save();
+        }
+
         EnemyHealthBar bar = GetComponentInChildren<EnemyHealthBar>();
         if (bar != null)
         {
             bar.gameObject.SetActive(false);
         }
 
-        // stop AI
         if (agent != null) agent.isStopped = true;
         if (ai != null) ai.enabled = false;
 
-        // disable collider
         Collider col = GetComponent<Collider>();
         if (col != null) col.enabled = false;
 
-        // destroy the spider after a short delay (so animation can play)
-        Destroy(gameObject, 1.5f); // 1.5 seconds delay
+        Destroy(gameObject, 1.5f);
     }
 }

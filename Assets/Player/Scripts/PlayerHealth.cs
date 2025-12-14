@@ -3,25 +3,47 @@ using UnityEngine;
 public class PlayerHealth : MonoBehaviour
 {
     public float maxHealth = 100f;
-    private float currentHealth;
+    [SerializeField] private float currentHealth;
 
     private bool isDead = false;
 
     [Header("UI Feedback")]
-    public DamageFlash damageFlash;   // you already set this up earlier
+    public DamageFlash damageFlash;
 
     [Header("UI")]
     public GameObject crosshair;
 
-
     private void Start()
     {
+        // Default to max
         currentHealth = maxHealth;
+
+        // ✅ If continuing, restore saved HP (if present)
+        if (SaveSystem.HasSave())
+        {
+            float saved = SaveSystem.GetSavedPlayerHealth(currentHealth);
+            SetHealthSilently(saved);
+        }
+    }
+
+    public float GetCurrentHealth() => currentHealth;
+
+    private void SetHealthSilently(float value)
+    {
+        currentHealth = Mathf.Clamp(value, 0f, maxHealth);
+
+        // If it was 0, treat as dead (but you probably won't continue in that state)
+        if (currentHealth <= 0f)
+        {
+            currentHealth = 0f;
+            isDead = true;
+        }
+
+        Debug.Log($"[PlayerHealth] Loaded health: {currentHealth}/{maxHealth}");
     }
 
     public void TakeDamage(float amount)
     {
-
         if (FirebaseGameAnalytics.Instance != null && FirebaseGameAnalytics.Instance.IsReady)
         {
             FirebaseGameAnalytics.Instance.LogGameplayEvent(
@@ -31,7 +53,6 @@ public class PlayerHealth : MonoBehaviour
                 Mathf.RoundToInt(amount)
             );
         }
-
 
         if (isDead) return;
 
@@ -58,25 +79,22 @@ public class PlayerHealth : MonoBehaviour
     }
 
     private void Die()
-{
-    if (isDead) return;
-    isDead = true;
+    {
+        if (isDead) return;
+        isDead = true;
 
-    Debug.Log("Player died!");
+        Debug.Log("Player died!");
 
-    // 🔻 Hide crosshair on Game Over
-    if (crosshair != null)
-        crosshair.SetActive(false);
+        if (crosshair != null)
+            crosshair.SetActive(false);
 
-    // 🔻 Hide the player health bar on Game Over
-    var healthUI = FindObjectOfType<PlayerHealthUI>();
-    if (healthUI != null)
-        healthUI.gameObject.SetActive(false);
+        var healthUI = FindObjectOfType<PlayerHealthUI>();
+        if (healthUI != null)
+            healthUI.gameObject.SetActive(false);
 
-    GameOverManager.Instance.ShowGameOver();
+        GameOverManager.Instance.ShowGameOver();
 
-    PlayerShooting shooting = GetComponent<PlayerShooting>();
-    if (shooting != null) shooting.enabled = false;
-}
-
+        PlayerShooting shooting = GetComponent<PlayerShooting>();
+        if (shooting != null) shooting.enabled = false;
+    }
 }

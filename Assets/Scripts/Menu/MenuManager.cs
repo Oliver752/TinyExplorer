@@ -52,8 +52,6 @@ public class MenuManager : MonoBehaviour
         PlayMenuMusic();
     }
 
-    // ------------------- MENU ACTIONS -------------------
-
     public void StartGame()
     {
         PlayClickSound();
@@ -68,7 +66,6 @@ public class MenuManager : MonoBehaviour
     {
         PlayClickSound();
 
-        // Firebase session start
         if (FirebaseGameAnalytics.Instance != null && FirebaseGameAnalytics.Instance.IsReady)
         {
             FirebaseGameAnalytics.Instance.StartSession();
@@ -86,7 +83,7 @@ public class MenuManager : MonoBehaviour
         if (string.IsNullOrEmpty(sceneToLoad))
             sceneToLoad = "Scene";
 
-        // ✅ Make intro controller skip the intro ONCE and spawn at saved position
+        // ✅ THIS IS THE MISSING LINE: skip intro once when continuing
         SaveSystem.RequestSkipIntroOnce();
 
         SceneManager.LoadScene(sceneToLoad);
@@ -112,8 +109,6 @@ public class MenuManager : MonoBehaviour
         mainMenuPanel.SetActive(true);
     }
 
-    // ------------------- SOUND -------------------
-
     public void PlayClickSound()
     {
         if (uiAudioSource != null && clickSound != null)
@@ -128,8 +123,6 @@ public class MenuManager : MonoBehaviour
         musicSource.loop = true;
         musicSource.Play();
     }
-
-    // ------------------- VOLUME -------------------
 
     public void SetMusicVolume(float volume)
     {
