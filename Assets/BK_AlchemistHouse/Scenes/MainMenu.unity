@@ -3716,6 +3716,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MainMenuNavigation
   buttons:
   - {fileID: 609046929}
+  - {fileID: 482464963}
   - {fileID: 789039964}
   - {fileID: 495902774}
 --- !u!1 &1705541864
